@@ -1,5 +1,13 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-    <h1>Home</h1>
+    <section class="Inicio-De-Web">
+        <div class="titulos">
+            <h1>INSTITUTO NACIONAL DE APOPA</h1>
+            <p>Hacia el Desarrollo y el Progreso, a través de la Educación</p>
+        </div>
+        <div class="logodelina">
+            <img src="{{url_for('static', filename='img/LogoInaSinFondo.png')}}" alt="Logo De Ina">
+        </div>
+    </section>
 {% endblock %}
