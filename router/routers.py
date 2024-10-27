@@ -1,9 +1,6 @@
 from flask import render_template
 from backend import db as db
 
-#crea la conexion con la base de datos ajustar a los que necesites esta es para xampp
-db = db(host="localhost", user="root", password="", database="pruebafullh")
-
 #crea la conexion con la base de datos
 #db = db(host="localhost", user="tu_usuario", password="tu_password", database="nombre_base_datos")
 

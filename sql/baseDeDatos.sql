@@ -7,6 +7,7 @@ CREATE TABLE padres (
     numero VARCHAR(15) UNIQUE,   
     correo VARCHAR(100) UNIQUE,
     dui VARCHAR(15) UNIQUE        
+<<<<<<< HEAD
 -- Crear la base de datos y seleccionarla
 CREATE DATABASE pruebaFull1;
 USE pruebaFull1;
@@ -18,6 +19,8 @@ CREATE TABLE Parents (
     phone VARCHAR(15),                            
     Gmail VARCHAR(100),
     Dui VARCHAR(15) UNIQUE                         -- Definir Dui como único para la relación
+=======
+>>>>>>> 2288a5b2d1469c020bcdcb82a873c221c18b046e
 );
 
 CREATE TABLE seccion (
@@ -27,10 +30,13 @@ CREATE TABLE section (
     seccion VARCHAR(1),
     año INT,
     especialidad VARCHAR(20) UNIQUE  -- Ensure this has a UNIQUE constraint
+<<<<<<< HEAD
     section VARCHAR(1),
     year INT,
     specialty VARCHAR(20),
     UNIQUE (section, year, specialty)              -- Crear índice único para claves foráneas
+=======
+>>>>>>> 2288a5b2d1469c020bcdcb82a873c221c18b046e
 );
 
 CREATE TABLE estudiantes (
@@ -72,11 +78,14 @@ CREATE TABLE Student (
 CREATE TABLE salida (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nie VARCHAR(15),                                
+<<<<<<< HEAD
 
 -- Crear la tabla assists con clave foránea hacia la tabla Student
 CREATE TABLE assists (
     id INT AUTO_INCREMENT PRIMARY KEY,
     Nie VARCHAR(15),                             
+=======
+>>>>>>> 2288a5b2d1469c020bcdcb82a873c221c18b046e
     data DATE,
     hour TIME,
     FOREIGN KEY (nie) REFERENCES estudiantes(nie)
