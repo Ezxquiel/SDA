@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <form class="Formulario" action="/padres" method="POST">
+        <label for="nombre">Nombre Completo</label>
+        <input type="text" id="nombre" name="nombre" placeholder="nombre" autofocus required>
+        <label for="numero">Número</label>
+        <input type="text" id="numero" name="numero" placeholder="numero" pattern="\d{4}-\d{4}" title="Formato: 0000-0000" required maxlength="9" minlength="9">
+        <label for="correo">Correo</label>
+        <input type="correo" id="correo" name="correo" placeholder="correo" required>
+        <label for="dui">DUI</label>
+        <input type="text" id="dui" name="dui" placeholder="dui" pattern="\d{8}-\d" title="Formato: 12345678-9" required maxlength="15" minlength="9">
+
+        <button type="submit">Enviar Datos</button>
+    </form>
+{% endblock %}

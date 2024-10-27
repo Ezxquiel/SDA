@@ -1,39 +1,48 @@
-CREATE TABLE Parents (
-    Id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    FullName VARCHAR(60),
-    phone VARCHAR(15),                            -- Cambiado a VARCHAR para permitir caracteres como +
-    Gmail VARCHAR(100),
-    Dui VARCHAR(15) UNIQUE                        -- Cambiado a VARCHAR y añadido UNIQUE
+CREATE TABLE padres (
+    Id INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(60),
+    numero VARCHAR(15),  									-- Permitir caracteres como +
+    correo VARCHAR(100),
+    dui VARCHAR(15) UNIQUE                                -- UNIQUE para que el DUI sea único
 );
 
-CREATE TABLE section (
+CREATE TABLE seccion (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    section VARCHAR(1),
+    seccion VARCHAR(1),
     year INT,
-    specialty VARCHAR(20)
+    especialidad VARCHAR(20)
 );
 
-CREATE TABLE Student (
-    Id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    FullName VARCHAR(60),
-    Nie VARCHAR(15),                              
-    age INT(2),                    
-    section VARCHAR(1),
-    year INT,                                      
-    code INT,
-    Dui VARCHAR(15),   
-    specialty VARCHAR(20),                      
-    FOREIGN KEY (section) REFERENCES section(section),
-    FOREIGN KEY (year) REFERENCES section(year),
-    FOREIGN KEY (specialty) REFERENCES section(specialty),
-    FOREIGN KEY (Dui) REFERENCES Parents(Dui)
+CREATE TABLE estudiantes (
+    Id INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(60),
+    nie VARCHAR(15) UNIQUE,                             -- Aseguramos que el NIE sea único
+    edad TINYINT,                                       -- Cambiado INT(2) a TINYINT por eficiencia
+    seccion_id INT,
+    año INT,                                            -- Mantener el campo year
+    codigo INT,
+    dui VARCHAR(15),
+    especialidad_id INT,
+    FOREIGN KEY (seccion_id) REFERENCES seccion(id),
+    FOREIGN KEY (año) REFERENCES seccion(year),
+    FOREIGN KEY (especialidad_id) REFERENCES seccion(id),
+    FOREIGN KEY (dui) REFERENCES padres(dui)
 );
 
-
-CREATE TABLE assists (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    Nie VARCHAR(15),                              -- Cambiado a VARCHAR para coincidir con Student
+CREATE TABLE entrada (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nie VARCHAR(15),                                    -- Coincide con estudiantes
     data DATE,
     hour TIME,
-    FOREIGN KEY (Nie) REFERENCES Student(Nie)
+    FOREIGN KEY (nie) REFERENCES estudiantes(nie)
 );
+
+CREATE TABLE salida (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nie VARCHAR(15),                                    -- Coincide con estudiantes
+    data DATE,
+    hour TIME,
+    FOREIGN KEY (nie) REFERENCES estudiantes(nie)
+);
+
+SELECT * FROM padres
