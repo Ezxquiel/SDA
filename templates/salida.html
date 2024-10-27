@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<form class="Formulario" action="/salida" method="POST">
+    <label for="nie">NIE</label>
+    <input type="text" id="nie" name="nie" autofocus required>
+    
+    <button type="submit">Registrar</button>
+</form>
+
+{% endblock %}
