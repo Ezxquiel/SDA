@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <form class="Formulario" action="" method="post">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" name="name" placeholder="Full Name" autofocus required>
+        <label for="Phone">Phone</label>
+        <input type="text" id="phone" name="phone" placeholder="Phone" pattern="\d{4}-\d{4}" title="Formato: 0000-0000" required maxlength="9" minlength="9">
+        <label for="gmail">Gmail</label>
+        <input type="email" id="gmail" name="gmail" placeholder="Gmail" required>
+        <label for="dui">DUI</label>
+        <input type="text" id="dui" name="dui" placeholder="DUI" pattern="\d{8}-\d" title="Formato: 12345678-9" required maxlength="15" minlength="9">
+
+        <button type="submit">Enviar Datos</button>
+    </form>
+{% endblock %}
