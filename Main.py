@@ -48,10 +48,11 @@ def db_operation(func):
             conn.close()
     return wrapper
 
+
 @app.route('/')
 @app.route('/home')
 def home_route():
-    return rt.home()  # Llama a la función home desde router
+    return rt.home()  # Llamamos a la función home desde router
 
 
 # UN PEDAZO DE CACA >>>>> PAWECHA 🧐
@@ -107,25 +108,51 @@ def secciones_router(cursor):
 @db_operation
 def estudiantes_router(cursor):
     if request.method == 'POST':
-        nombre = request.form['nombre']
-        nie = request.form['nie']
-        edad = request.form['edad']
-        año = request.form['año']
-        codigo = request.form['codigo']
-
         try:
-            cursor.execute(
-                #            *Se la INSERTA >~<*
-                "INSERT INTO estudiantes (nombre, nie, edad, año, codigo) VALUES (%s, %s, %s, %s, %s)",
-                (nombre, nie, edad, año, codigo)
-                )
-            flash('alumno registrado con éxito. ', 'success')
+            # Obtener datos del formulario
+            nombre = request.form['nombre']
+            nie = request.form['nie']
+            edad = request.form['edad']
+            año = request.form['año']
+            codigo = request.form['codigo']
+            dui = request.form['dui']
+            seccion = request.form['seccion']
+
+            # Verificar si el padre existe
+            cursor.execute("SELECT * FROM padres WHERE dui = %s", (dui,))
+            padre = cursor.fetchone()
+            if not padre:
+                flash('El DUI del padre no está registrado.', 'danger')
+                return redirect(url_for('estudiantes_router'))
+            
+            # Verificar si la sección existe
+            cursor.execute("SELECT * FROM seccion WHERE seccion = %s AND año = %s", 
+                         (seccion, año))
+            seccion_exists = cursor.fetchone()
+            if not seccion_exists:
+                flash('La sección o año especificado no existe.', 'danger')
+                return redirect(url_for('estudiantes_router'))
+
+            # Insertar estudiante
+            cursor.execute("""
+                INSERT INTO estudiantes 
+                (nombre, nie, edad, año, codigo, dui, seccion) 
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """, (nombre, nie, edad, año, codigo, dui, seccion))
+            
+            flash('Alumno registrado con éxito.', 'success')
+            
+        except pymysql.err.IntegrityError as e:
+            if e.args[0] == 1062:  # Error de duplicado
+                flash('Error: El NIE ya está registrado.', 'danger')
+            else:
+                flash(f'Error en la base de datos: {str(e)}', 'danger')
         except Exception as e:
-            flash(f'Error al registrar alumno: {e}', 'danger')
+            flash(f'Error inesperado: {str(e)}', 'danger')
             
         return redirect(url_for('estudiantes_router')) 
 
-    return render_template('/estudiantes.html')
+    return render_template('estudiantes.html')
 
 
 @app.route('/asistencia', methods=['GET', 'POST'])
@@ -146,7 +173,7 @@ def asistencia_router(cursor):
                 hora_actual = datetime.now().time()
                 cursor.execute(
                     #              *Se la INSERTA >~<*
-                    "INSERT INTO entrada (nie, data, hour) VALUES (%s, %s, %s)",
+                    "INSERT INTO entrada (nie, fecha, hora) VALUES (%s, %s, %s)",
                     (nie_estudiante, fecha_actual, hora_actual)
                 )
                 connection.commit() 
@@ -181,7 +208,7 @@ def salida_router(cursor):
                 cursor.execute(
 
                             #*Se la INSERTA >~<*
-                    "INSERT INTO salida (nie, data, hour) VALUES (%s, %s, %s)",
+                    "INSERT INTO salida (nie, fecha, hora) VALUES (%s, %s, %s)",
                     (nie_estudiante, fecha_actual, hora_actual)
                 )
                 connection.commit() 
@@ -197,6 +224,89 @@ def salida_router(cursor):
         return redirect(url_for('salida_router')) 
 
     return render_template('/salida.html')
+
+
+
+
+@app.route('/administracion', methods=['GET', 'POST'])
+def administracion():
+    conn = get_db_connection()
+    if not conn:
+        flash("No se pudo conectar a la base de datos.", "danger")
+        return render_template('administracion.html', asistencias_hoy=[], salidas_hoy=[])
+
+    asistencias_hoy = []
+    salidas_hoy = []
+    busqueda = ''
+    fecha_inicio = ''
+    fecha_fin = ''
+
+    if request.method == 'POST':
+        busqueda = request.form.get('busqueda', '').strip()
+        fecha_inicio = request.form.get('fecha_inicio')
+        fecha_fin = request.form.get('fecha_fin')
+        descargar_pdf = request.form.get('descargar_pdf')
+
+        # Si no se proporcionan fechas, usar la fecha actual
+        if not fecha_inicio:
+            fecha_inicio = 'CURRENT_DATE'
+        if not fecha_fin:
+            fecha_fin = 'CURRENT_DATE'
+
+        try:
+            with conn.cursor() as cursor:
+                # Consulta para entradas
+                cursor.execute(
+                    """SELECT 
+                        e.nombre, 
+                        e.codigo, 
+                        e.nie, 
+                        ent.fecha,
+                        ent.hora 
+                    FROM entrada ent
+                    JOIN estudiantes e ON ent.nie = e.nie 
+                    WHERE (e.nie LIKE %s OR e.codigo LIKE %s) 
+                    AND ent.fecha BETWEEN %s AND %s
+                    ORDER BY ent.fecha DESC, ent.hora DESC""",
+                    ('%' + busqueda + '%', '%' + busqueda + '%', fecha_inicio, fecha_fin)
+                )
+                asistencias_hoy = cursor.fetchall()
+                
+                # Consulta para salidas
+                cursor.execute(
+                    """SELECT 
+                        e.nombre, 
+                        e.codigo, 
+                        e.nie, 
+                        sal.fecha,
+                        sal.hora
+                    FROM salida sal
+                    JOIN estudiantes e ON sal.nie = e.nie 
+                    WHERE (e.nie LIKE %s OR e.codigo LIKE %s) 
+                    AND sal.fecha BETWEEN %s AND %s
+                    ORDER BY sal.fecha DESC, sal.hora DESC""",
+                    ('%' + busqueda + '%', '%' + busqueda + '%', fecha_inicio, fecha_fin)
+                )
+                salidas_hoy = cursor.fetchall()
+
+                print("Asistencias encontradas:", asistencias_hoy)
+                print("Salidas encontradas:", salidas_hoy)
+
+        except Exception as e:
+            print(f"Error en la consulta: {str(e)}")
+            flash("Error al consultar la base de datos.", "danger")
+        finally:
+            conn.close()
+
+        if descargar_pdf:
+            return generar_pdf(asistencias_hoy)
+
+    return render_template('administracion.html', 
+                         asistencias_hoy=asistencias_hoy, 
+                         salidas_hoy=salidas_hoy,
+                         busqueda=busqueda,
+                         fecha_inicio=fecha_inicio,
+                         fecha_fin=fecha_fin)
 
 if __name__ == '__main__':
     app.run(debug=True)

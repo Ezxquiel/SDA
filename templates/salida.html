@@ -2,11 +2,30 @@
 
 {% block content %}
 
-<form class="Formulario" action="/salida" method="POST">
+<form id="FormularioForm" class="Formulario" action="/salida" method="POST">
     <label for="nie">NIE</label>
     <input type="text" id="nie" name="nie" autofocus required>
     
     <button type="submit">Registrar</button>
 </form>
+
+<script>
+    let typingTimer;                
+    const doneTypingInterval = 1000; //tiempo de espera
+
+    const input = document.getElementById('nie');
+
+
+    input.addEventListener('keyup', () => {
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(() => {
+            document.getElementById('FormularioForm').submit(); 
+        }, doneTypingInterval);
+    });
+
+    input.addEventListener('keydown', () => {
+        clearTimeout(typingTimer);
+    });
+</script>
 
 {% endblock %}

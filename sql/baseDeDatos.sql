@@ -1,107 +1,77 @@
-CREATE DATABASE by8ekzvhusvvn2yqc71b;
-USE by8ekzvhusvvn2yqc71b;
 
+-- Primera tabla: padres
 CREATE TABLE padres (
     Id INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(60),
-    numero VARCHAR(15) UNIQUE,   
+    numero VARCHAR(15) UNIQUE,
     correo VARCHAR(100) UNIQUE,
-    dui VARCHAR(15) UNIQUE        
-<<<<<<< HEAD
--- Crear la base de datos y seleccionarla
-CREATE DATABASE pruebaFull1;
-USE pruebaFull1;
-
--- Crear la tabla Parents
-CREATE TABLE Parents (
-    Id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    FullName VARCHAR(60),
-    phone VARCHAR(15),                            
-    Gmail VARCHAR(100),
-    Dui VARCHAR(15) UNIQUE                         -- Definir Dui como único para la relación
-=======
->>>>>>> 2288a5b2d1469c020bcdcb82a873c221c18b046e
+    dui VARCHAR(15) 
 );
 
+-- Segunda tabla: seccion (con los índices necesarios)
 CREATE TABLE seccion (
--- Crear la tabla section
-CREATE TABLE section (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    seccion VARCHAR(1),
-    año INT,
-    especialidad VARCHAR(20) UNIQUE  -- Ensure this has a UNIQUE constraint
-<<<<<<< HEAD
-    section VARCHAR(1),
-    year INT,
-    specialty VARCHAR(20),
-    UNIQUE (section, year, specialty)              -- Crear índice único para claves foráneas
-=======
->>>>>>> 2288a5b2d1469c020bcdcb82a873c221c18b046e
+    seccion VARCHAR(1) NOT NULL,
+    año INT NOT NULL,
+    especialidad VARCHAR(20) NOT NULL,
+    UNIQUE KEY unique_especialidad (especialidad),
+    KEY idx_seccion (seccion),
+    KEY idx_año (año)
 );
 
+-- Tercera tabla: estudiantes
 CREATE TABLE estudiantes (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    nombre VARCHAR(200),
-    nie VARCHAR(15) UNIQUE,                             
-    edad TINYINT,    
-    año INT,
-    codigo VARCHAR(4),
-    seccion INT,
-    FOREIGN KEY (seccion) REFERENCES seccion(id),
+    nombre VARCHAR(200) NOT NULL,
+    nie VARCHAR(15) UNIQUE NOT NULL,
+    edad TINYINT,
+    año INT NOT NULL,
+    seccion VARCHAR(1) NOT NULL,
     dui VARCHAR(15),
+    especialidad VARCHAR(20),
+    codigo VARCHAR(4),
+    FOREIGN KEY (año) REFERENCES seccion(año),
+    FOREIGN KEY (seccion) REFERENCES seccion(seccion),
     FOREIGN KEY (dui) REFERENCES padres(dui),
-    especialidad VARCHAR(100),
-    FOREIGN KEY (especialidad) REFERENCES seccion(especialidad)  -- Ensure this references a UNIQUE column
+    FOREIGN KEY (especialidad) REFERENCES seccion(especialidad)
 );
 
+-- Cuarta tabla: entrada
 CREATE TABLE entrada (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    nie VARCHAR(15),                                    
-    data DATE,
-    hour TIME,
+    nie VARCHAR(15),
+    fecha DATE,
+    hora TIME,
     FOREIGN KEY (nie) REFERENCES estudiantes(nie)
--- Crear la tabla Student con claves foráneas hacia las tablas section y Parents
-CREATE TABLE Student (
-    Id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    FullName VARCHAR(60),
-    Nie VARCHAR(15) UNIQUE,                        -- Definir Nie como único para la relación
-    age INT CHECK (age >= 0),                    
-    section VARCHAR(1),
-    year INT,                                      
-    code INT,
-    Dui VARCHAR(15),   
-    specialty VARCHAR(20),                      
-    FOREIGN KEY (section, year, specialty) REFERENCES section(section, year, specialty),
-    FOREIGN KEY (Dui) REFERENCES Parents(Dui)
 );
 
+-- Quinta tabla: salida
 CREATE TABLE salida (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    nie VARCHAR(15),                                
-<<<<<<< HEAD
-
--- Crear la tabla assists con clave foránea hacia la tabla Student
-CREATE TABLE assists (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    Nie VARCHAR(15),                             
-=======
->>>>>>> 2288a5b2d1469c020bcdcb82a873c221c18b046e
-    data DATE,
-    hour TIME,
+    nie VARCHAR(15),
+    fecha DATE,
+    hora TIME,
     FOREIGN KEY (nie) REFERENCES estudiantes(nie)
-    FOREIGN KEY (Nie) REFERENCES Student(Nie)      -- Clave foránea para Nie
 );
 
+
+
 SELECT 
-    e.*,
+    e.id AS estudiante_id,
+    e.nombre AS nombre_estudiante,
+    e.nie,
+    e.edad,
+    e.codigo,
+    s.seccion,
+    s.año,
+    s.especialidad,
     p.nombre AS nombre_padre,
-    p.numero AS telefono_padre,
-    p.correo AS correo_padre
+    p.numero AS numero_padre,
+    p.correo AS correo_padre,
+    p.dui AS dui_padre
 FROM 
     estudiantes e
+JOIN 
+    seccion s ON e.año = s.año AND e.seccion = s.seccion  -- Join with seccion
 LEFT JOIN 
-    padres p ON e.dui = p.dui;
-
-
-
-SELECT * FROM estudiantes
+    padres p ON e.dui = p.dui;  -- Left join with padres to get parent info

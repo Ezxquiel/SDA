@@ -27,3 +27,9 @@ def salida():
     web_name: str = 'Registro de salida'
     return render_template('salida.html', web_name=web_name)
 
+def administracion():
+    web_name: str = 'Administracion'
+    return render_template('administracion.html', web_name=web_name)
+
+
+
