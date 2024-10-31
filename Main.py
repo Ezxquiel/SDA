@@ -10,8 +10,6 @@ import calendar
 from io import BytesIO
 import os
 
-
-
 app = Flask(__name__)
 app.secret_key = os.urandom(24) #llave random para que funcione ALV 
 
@@ -108,10 +106,19 @@ def secciones_router(cursor):
 
     return render_template('/secciones.html')
 
-
 @app.route('/estudiantes', methods=['GET', 'POST'])
 @db_operation
 def estudiantes_router(cursor):
+    # Fetch available DUIs, sections, and years to populate the form
+    cursor.execute("SELECT dui FROM padres")  # Fetch DUIs from parents
+    duis = [row['dui'] for row in cursor.fetchall()]  # Using DictCursor
+
+    cursor.execute("SELECT seccion FROM seccion")  # Fetch sections
+    secciones = [row['seccion'] for row in cursor.fetchall()]  # Using DictCursor
+
+    cursor.execute("SELECT DISTINCT año FROM seccion")  # Fetch distinct years
+    anios = [row['año'] for row in cursor.fetchall()]  # Using DictCursor
+
     if request.method == 'POST':
         try:
             # Obtener datos del formulario
@@ -132,7 +139,7 @@ def estudiantes_router(cursor):
             
             # Verificar si la sección existe
             cursor.execute("SELECT * FROM seccion WHERE seccion = %s AND año = %s", 
-                         (seccion, año))
+                           (seccion, año))
             seccion_exists = cursor.fetchone()
             if not seccion_exists:
                 flash('La sección o año especificado no existe.', 'danger')
@@ -157,7 +164,8 @@ def estudiantes_router(cursor):
             
         return redirect(url_for('estudiantes_router')) 
 
-    return render_template('estudiantes.html')
+    return render_template('estudiantes.html', duis=duis, secciones=secciones, anios=anios)
+
 
 
 @app.route('/asistencia', methods=['GET', 'POST'])
@@ -230,8 +238,37 @@ def salida_router(cursor):
 
     return render_template('/salida.html')
 
+def generar_pdf(asistencias):
+    buffer = BytesIO()
+    p = canvas.Canvas(buffer, pagesize=A4)
+    width, height = A4
 
+    # Title
+    p.drawString(100, height - 100, "Reporte de Asistencias")
 
+    # Table headers
+    x_offset = 50
+    y_offset = height - 150
+    line_height = 20
+    headers = ["Nombre", "Código", "NIE", "Fecha", "Hora"]
+    for i, header in enumerate(headers):
+        p.drawString(x_offset + i * 100, y_offset, header)
+    y_offset -= line_height
+
+    # Table rows
+    for asistencia in asistencias:
+        for i, item in enumerate(asistencia):
+            p.drawString(x_offset + i * 100, y_offset, str(item))
+        y_offset -= line_height
+
+    p.showPage()
+    p.save()
+    buffer.seek(0)
+
+    response = make_response(buffer.read())
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'attachment; filename="asistencias.pdf"'
+    return response
 
 @app.route('/administracion', methods=['GET', 'POST'])
 def administracion():
@@ -252,11 +289,9 @@ def administracion():
         fecha_fin = request.form.get('fecha_fin')
         descargar_pdf = request.form.get('descargar_pdf')
 
-        # Si no se proporcionan fechas, usar la fecha actual
-        if not fecha_inicio:
-            fecha_inicio = 'CURRENT_DATE'
-        if not fecha_fin:
-            fecha_fin = 'CURRENT_DATE'
+        # Usar la fecha actual si no se ingresan fechas
+        fecha_inicio = fecha_inicio if fecha_inicio else datetime.now().date()
+        fecha_fin = fecha_fin if fecha_fin else datetime.now().date()
 
         try:
             with conn.cursor() as cursor:

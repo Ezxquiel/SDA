@@ -155,49 +155,54 @@
   }
 }
 
-/* Formulario */
+/*Formulario*/
 
-.Formulario{
+/* Formulario */
+.Formulario {
   margin: 5% auto;
-  padding: 10px;
+  padding: 20px; /* Increased padding for better spacing */
   display: flex;
   flex-direction: column;
   width: 400px;
-  height: 330px;
-  align-items: flex-start;
-  justify-content: flex-start;
-  box-shadow: black 0px 0px 5px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5); /* Softer shadow */
   border-radius: 10px;
+  background-color: #f9f9f9; /* Light background for better contrast */
 }
 
-.Formulario label{
-  margin: 5px;
+.Formulario label {
+  margin: 5px 0; /* Reduced margin for better alignment */
+  font-weight: bold; /* Make labels bold for better readability */
 }
 
-.Formulario input {
-  width: 90%;
-  height: 20px;
-  margin: 10px;
+.Formulario input, .Formulario select {
+  width: 98%; /* Full width inputs and selects */
+  height: 35px; /* Increased height for easier clicking */
+  margin: 10px 0; /* Consistent vertical spacing */
   padding-left: 10px;
-  border: none; /* Cambiado de 'white' a 'none' */
-  box-shadow: 0px 0px 5px black;
+  border: 1px solid #ccc; /* Subtle border */
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2); /* Softer shadow */
   border-radius: 5px;
+  transition: box-shadow 0.3s ease; /* Smooth transition effect */
 }
 
-.Formulario input:focus {
+.Formulario input:focus, .Formulario select:focus {
   outline: none;
-  box-shadow: 0px 0px 10px rgb(0, 0, 0);
-  border-radius: 5px;
+  box-shadow: 0px 0px 10px rgb(0, 0, 0); /* Stronger shadow on focus */
 }
 
-
-.Formulario button{
-  width: 30%;
-  height: 30px;
-  border: white;
-  background-color: white;
-  box-shadow: black 0px 0px 5px;
+.Formulario button {
+  width: 100%; /* Full-width button */
+  height: 40px; /* Increased height */
+  border: none; /* Remove border */
+  background-color: #000000; /* Green background */
+  color: white; /* White text */
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3); /* Softer shadow */
   border-radius: 5px;
-  margin: 5px;
   margin-top: 15px;
+  cursor: pointer; /* Pointer cursor */
+  transition: background-color 0.3s ease; /* Smooth background transition */
+}
+
+.Formulario button:hover {
+  background-color: #555555; /* Darker green on hover */
 }
