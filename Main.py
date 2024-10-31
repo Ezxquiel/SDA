@@ -1,11 +1,16 @@
 from multiprocessing.dummy import connection
-from flask import Flask, request, flash, redirect, url_for, render_template
+from flask import Flask, request, flash, redirect, url_for, render_template, make_response
 from router import routers as rt
 import pymysql
 from pymysql.cursors import DictCursor
-import os
+from fpdf import FPDF
 from functools import wraps
 from datetime import datetime
+import calendar 
+from io import BytesIO
+import os
+
+
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24) #llave random para que funcione ALV 
@@ -208,7 +213,7 @@ def salida_router(cursor):
                 cursor.execute(
 
                             #*Se la INSERTA >~<*
-                    "INSERT INTO salida (nie, fecha, hora) VALUES (%s, %s, %s)",
+                    "INSERT INTO salida (nie, fecha, hora) VALUES (%s, %s, %s, %s)",
                     (nie_estudiante, fecha_actual, hora_actual)
                 )
                 connection.commit() 
@@ -261,6 +266,7 @@ def administracion():
                         e.nombre, 
                         e.codigo, 
                         e.nie, 
+                        ent.id_entrada,
                         ent.fecha,
                         ent.hora 
                     FROM entrada ent
@@ -278,6 +284,7 @@ def administracion():
                         e.nombre, 
                         e.codigo, 
                         e.nie, 
+                        sal.id_salida,
                         sal.fecha,
                         sal.hora
                     FROM salida sal
@@ -299,14 +306,177 @@ def administracion():
             conn.close()
 
         if descargar_pdf:
-            return generar_pdf(asistencias_hoy)
+            return generar_pdf(asistencias_hoy, salidas_hoy)
 
     return render_template('administracion.html', 
                          asistencias_hoy=asistencias_hoy, 
-                         salidas_hoy=salidas_hoy,
-                         busqueda=busqueda,
-                         fecha_inicio=fecha_inicio,
-                         fecha_fin=fecha_fin)
+                         salidas_hoy=salidas_hoy)
+
+
+
+def generar_pdf(entrada, salidas, mes=None, año=None):
+    print("Generando PDF con asistencias:", entrada)
+    print("Generando PDF con salidas:", salidas)
+
+    # Si no se especifica mes o año, usar la fecha del primer registro
+    if mes is None or año is None and entrada:
+        primera_fecha = datetime.strptime(str(entrada[0]['fecha']), '%Y-%m-%d')
+        mes = mes or primera_fecha.month
+        año = año or primera_fecha.year
+    else:
+        # Si no hay registros, usar fecha actual
+        ahora = datetime.now()
+        mes = mes or ahora.month
+        año = año or ahora.year
+
+    pdf = FPDF()
+    pdf.add_page()
+    
+    # Agregar marca de agua
+    pdf.set_font('Arial', 'B', 50)
+    pdf.set_text_color(200, 200, 200)  # Gris claro
+    pdf.rotate(45, 105, 140)
+    pdf.text(75, 140, 'ASISTENCIAS')
+    pdf.rotate(0)
+    pdf.set_text_color(0, 0, 0)  # Volver a negro
+
+        # Agregar el logo
+    logo_path = 'static/img/logoInaSinFondo.png'  # Ruta de tu imagen
+    pdf.image(logo_path, x=10, y=10, w=40, h=40)  # Ajusta la posición y tamaño
+
+    # Título del documento
+    pdf.set_font('Arial', 'B', 16)
+    pdf.cell(0, 70, 'Reporte de Asistencia'.encode('latin-1').decode('latin-1'), 0, 1, 'C')
+
+    # Agregar calendario de asistencias
+    pdf.ln(10)
+    pdf.set_font('Arial', 'B', 12)
+    pdf.cell(200, 10, 'Calendario de Asistencias'.encode('latin-1').decode('latin-1'), ln=True, align='C')
+
+    # Crear un diccionario de fechas asistidas
+    fechas_asistidas = {str(entrada['fecha']): True for entrada in entrada}
+
+    # Configurar calendario para comenzar en domingo
+    calendar.setfirstweekday(calendar.SUNDAY)
+    
+    # Crear el calendario
+    mes_cal = calendar.monthcalendar(año, mes)
+
+    # Encabezado del mes con diseño mejorado
+    pdf.set_fill_color(51, 122, 183)  # Azul corporativo
+    pdf.set_text_color(255, 255, 255)  # Texto blanco
+    # Usar el nombre del mes en español
+    nombres_meses = {
+        1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril',
+        5: 'Mayo', 6: 'Junio', 7: 'Julio', 8: 'Agosto',
+        9: 'Septiembre', 10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'
+    }
+    nombre_mes = nombres_meses[mes].encode('latin-1').decode('latin-1')
+    pdf.cell(0, 10, f"{nombre_mes} {año}", 1, 1, 'C', True)
+
+    # Días de la semana con diseño mejorado
+    pdf.set_font('Arial', 'B', 10)
+    dias = ['Dom', 'Lun', 'Mar', 'Mié'.encode('latin-1').decode('latin-1'), 
+            'Jue', 'Vie', 'Sáb'.encode('latin-1').decode('latin-1')]
+    pdf.set_fill_color(240, 240, 240)  # Gris claro para encabezados
+    pdf.set_text_color(0, 0, 0)  # Texto negro
+    for dia in dias:
+        pdf.cell(27, 10, dia, 1, 0, 'C', True)
+    pdf.ln()
+
+    # Contadores de días asistidos y no asistidos
+    total_asistidos = 0
+    total_no_asistidos = 0
+    dias_habiles = 0  # Contador para días hábiles (no domingos)
+
+    # Imprimir el calendario con diseño mejorado
+    pdf.set_font('Arial', '', 10)
+    for semana in mes_cal:
+        for i, dia in enumerate(semana):
+            if dia == 0:
+                pdf.set_fill_color(245, 245, 245)  # Gris muy claro para celdas vacías
+                pdf.cell(27, 10, '', 1, 0, 'C', True)
+            else:
+                dia_str = f"{año}-{mes:02d}-{dia:02d}"
+                if i != 0:  # Si no es domingo
+                    dias_habiles += 1  # Incrementar contador de días hábiles
+                    if dia_str in fechas_asistidas:
+                        pdf.set_fill_color(223, 240, 216)  # Verde claro para asistencias
+                        pdf.set_text_color(0, 128, 0)
+                        total_asistidos += 1
+                    else:
+                        pdf.set_fill_color(242, 222, 222)  # Rojo claro para no asistencias
+                        pdf.set_text_color(169, 68, 66)
+                        total_no_asistidos += 1
+                else:  # Si es domingo
+                    pdf.set_fill_color(220, 220, 220)  # Gris para domingos
+                    pdf.set_text_color(128, 128, 128)
+                
+                pdf.cell(27, 10, str(dia), 1, 0, 'C', True)
+                pdf.set_text_color(0, 0, 0)
+        pdf.ln()
+
+    # Agregar totales con diseño mejorado
+    pdf.ln(10)
+    pdf.set_font('Arial', 'B', 10)
+    pdf.set_fill_color(240, 240, 240)
+    pdf.cell(63, 10, f'Días Hábiles: {dias_habiles}'.encode('latin-1').decode('latin-1'), 1, 0, 'C', True)
+    pdf.cell(63, 10, f'Días Asistidos: {total_asistidos}'.encode('latin-1').decode('latin-1'), 1, 0, 'C', True)
+    pdf.cell(64, 10, f'Días No Asistidos: {total_no_asistidos}'.encode('latin-1').decode('latin-1'), 1, 1, 'C', True)
+
+    # Tablas de asistencias y salidas con diseño mejorado
+    def crear_tabla(titulo, datos, es_entrada=True):
+        pdf.ln(10)
+        # Título de la sección
+        pdf.set_font('Arial', 'B', 12)
+        pdf.set_fill_color(51, 122, 183)
+        pdf.set_text_color(255, 255, 255)
+        pdf.cell(190, 10, titulo.encode('latin-1').decode('latin-1'), 1, 1, 'C', True)
+        
+        # Encabezados
+        pdf.set_font('Arial', 'B', 8)
+        pdf.set_fill_color(240, 240, 240)
+        pdf.set_text_color(0, 0, 0)
+        headers = [
+            ('ID', 20),
+            ('NIE Estudiante', 30),
+            ('Nombre', 50),
+            ('Fecha', 45),
+            ('Hora', 45)
+        ]
+        
+        for header, width in headers:
+            pdf.cell(width, 10, header.encode('latin-1').decode('latin-1'), 1, 0, 'C', True)
+        pdf.ln()
+        
+        # Datos
+        pdf.set_font('Arial', '', 8)
+        for i, dato in enumerate(datos):
+            # Alternar colores de fondo para mejor legibilidad
+            pdf.set_fill_color(255, 255, 255) if i % 2 == 0 else pdf.set_fill_color(245, 245, 245)
+            
+            id_key = 'id_entrada' if es_entrada else 'id_salida'
+            pdf.cell(20, 10, str(dato[id_key]), 1, 0, 'C', True)
+            pdf.cell(30, 10, str(dato['nie']), 1, 0, 'C', True)
+            nombre_codificado = dato['nombre'].encode('latin-1').decode('latin-1')
+            pdf.cell(50, 10, nombre_codificado, 1, 0, 'L', True)
+            pdf.cell(45, 10, str(dato['fecha']), 1, 0, 'C', True)
+            pdf.cell(45, 10, str(dato['hora']), 1, 1, 'C', True)
+
+    crear_tabla('Registro de Entradas', entrada, True)
+    crear_tabla('Registro de Salidas', salidas, False)
+
+    # Agregar pie de página
+    pdf.set_y(-30)
+    pdf.set_font('Arial', 'I', 8)
+    pdf.cell(0, 10, f'Generado el {datetime.now().strftime("%d/%m/%Y %H:%M:%S")}'.encode('latin-1').decode('latin-1'), 0, 0, 'C')
+
+    response = make_response(pdf.output(dest='S').encode('latin-1'))
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = 'attachment; filename=Reporte_Asistencia_Salida.pdf'
+    
+    return response
+
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,0 +1,12 @@
+pip install fpdf==1.7.2
+
+unica version o bueno no unica 
+pero fue la que encontre despues de 
+estar buscando por un buen rato una 
+puta version que fuese compatible con 
+la codificación de ".encode" asi que si  
+"AttributeError: 'bytearray' object has no attribute 'encode'. Did you mean: 'decode'?"
+les tira ese error instalen esa version madafakassssss
+y ya    ZZZZZZZZZZZZZ
+ 
+ MIS NIÑAS ♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥♥
