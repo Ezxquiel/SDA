@@ -1,173 +1,232 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-
 <style>
-    /* General Container */
-    .container {
+    .admin-container {
         max-width: 1200px;
         margin: 0 auto;
-        padding: 20px;
-        font-family: Arial, sans-serif;
-        color: #000;
+        padding: 2rem;
+        font-family: 'Inter', system-ui, sans-serif;
     }
 
-    /* Title Styles */
-    h1, h2 {
+    .page-title {
+        color: #1a1a1a;
+        font-size: 2rem;
+        font-weight: 600;
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e5e7eb;
     }
 
-    /* Form Styles */
-    .Formulario {
-        margin: 5% ;
-        padding: 20px; /* Increased padding for better spacing */
-        display: flex;
-        flex-direction: column;
-        width: 400px;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5); /* Softer shadow */
-        border-radius: 10px;
-        background-color: #f9f9f9; /* Light background for better contrast */
+    /* Search Form Styles */
+    .search-form {
+        background: #ffffff;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr auto auto;
+        gap: 1rem;
+        align-items: end;
     }
 
-    .Formulario label {
-        margin: 5px 0; /* Reduced margin for better alignment */
-        font-weight: bold; /* Make labels bold for better readability */
+    .search-form input {
+        padding: 0.75rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        font-size: 0.95rem;
+        transition: border-color 0.15s ease;
     }
 
-    .Formulario input, .Formulario select {
-        width: 98%; /* Full width inputs and selects */
-        height: 35px; /* Increased height for easier clicking */
-        margin: 10px 0; /* Consistent vertical spacing */
-        padding-left: 10px;
-        border: 1px solid #ccc; /* Subtle border */
-        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2); /* Softer shadow */
-        border-radius: 5px;
-        transition: box-shadow 0.3s ease; /* Smooth transition effect */
-    }
-
-    .Formulario input:focus, .Formulario select:focus {
+    .search-form input:focus {
         outline: none;
-        box-shadow: 0px 0px 10px rgb(0, 0, 0); /* Stronger shadow on focus */
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
     }
 
-    .Formulario button {
-        width: 100%; /* Full-width button */
-        height: 40px; /* Increased height */
-        border: none; /* Remove border */
-        background-color: #000000; /* Green background */
-        color: white; /* White text */
-        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3); /* Softer shadow */
-        border-radius: 5px;
-        margin-top: 15px;
-        cursor: pointer; /* Pointer cursor */
-        transition: background-color 0.3s ease; /* Smooth background transition */
+    .search-form button {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
     }
 
-    .Formulario button:hover {
-        background-color: #555555; /* Darker green on hover */
+    .btn-search {
+        background-color: #2563eb;
+        color: white;
     }
 
-    /* List Styles */
-    .record-list {
-        list-style-type: none;
-        padding: 0;
-        margin-bottom: 30px;
+    .btn-search:hover {
+        background-color: #1d4ed8;
     }
 
-    .record-list li {
-        border: 1px solid #000;
-        padding: 12px;
-        margin: 5px 0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background-color: #fff;
+    .btn-download {
+        background-color: #059669;
+        color: white;
     }
 
-    .record-list li:nth-child(even) {
-        background-color: #f9f9f9;
+    .btn-download:hover {
+        background-color: #047857;
+    }
+
+    /* Records Section Styles */
+    .records-section {
+        background: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        padding: 1rem 1.5rem;
+        background-color: #f8fafc;
+        border-bottom: 1px solid #e5e7eb;
+        margin: 0;
+    }
+
+    .records-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .records-table th,
+    .records-table td {
+        padding: 1rem 1.5rem;
+        text-align: left;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .records-table th {
+        background-color: #f8fafc;
+        font-weight: 600;
+        color: #4b5563;
+        white-space: nowrap;
+    }
+
+    .records-table tr:hover {
+        background-color: #f9fafb;
     }
 
     .empty-message {
         text-align: center;
-        padding: 20px;
-        color: #666;
+        padding: 2rem;
+        color: #6b7280;
         font-style: italic;
     }
- 
-    /* Estilo para el checkbox */
-    .form-check {
-        padding: 10px;
-    }
- 
-    .form-check-input {
-        margin-top: 0.3rem;
-    }
- 
-    /* Responsive */
-    @media (max-width: 768px) {
-        .container {
-            padding: 10px;
-        }
- 
-        .table-responsive {
-            overflow-x: auto;
-        }
-        
-        .form-row {
-            flex-direction: column;
-        }
-        
-        .col-auto {
-            margin-bottom: 10px;
-        }
-    }
- </style>
- 
- <div class="container">
-    <h1 class="mt-5">Administración de Asistencia y Salida</h1>
 
-    <form method="POST" action="/administracion">
-        <input type="text" name="busqueda" placeholder="Buscar..." required autocomplete="off" autofocus>
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .search-form {
+            grid-template-columns: 1fr 1fr;
+        }
+        
+        .records-table {
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .admin-container {
+            padding: 1rem;
+        }
+
+        .search-form {
+            grid-template-columns: 1fr;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+
+<div class="admin-container">
+    <h1 class="page-title">Administración de Asistencia y Salida</h1>
+
+    <form class="search-form" method="POST" action="/administracion">
+        <input type="text" name="busqueda" placeholder="Buscar por NIE o código..." required autocomplete="off" autofocus>
         <input type="date" name="fecha_inicio" placeholder="Fecha de inicio">
         <input type="date" name="fecha_fin" placeholder="Fecha de fin">
-        <button type="submit" name="descargar_pdf" value="true">Descargar PDF</button>
-        <button type="submit">Buscar</button>
+        <button type="submit" name="descargar_pdf" value="true" class="btn-download">
+            Descargar PDF
+        </button>
+        <button type="submit" class="btn-search">
+            Buscar
+        </button>
     </form>
-    
 
-    <div class="records">
-        <h2>Registro de Entradas</h2>
-        <ul class="record-list">
-            {% for asistencia in asistencias_hoy %}
-            <li>
-                <span>{{ asistencia.nombre }}</span>
-                <span>{{ asistencia.codigo }}</span>
-                <span>{{ asistencia.nie }}</span>
-                <span>{{ asistencia.fecha }}</span>
-                <span>{{ asistencia.hora }}</span>
-            </li>
-            {% else %}
-            <li class="empty-message">No se encontraron registros de entrada.</li>
-            {% endfor %}
-        </ul>
+    <div class="records-section">
+        <h2 class="section-title">Registro de Entradas</h2>
+        {% if asistencias_hoy %}
+        <table class="records-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Código</th>
+                    <th>Género</th>
+                    <th>NIE</th>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for asistencia in asistencias_hoy %}
+                <tr>
+                    <td>{{ asistencia.nombre }}</td>
+                    <td>{{ asistencia.codigo }}</td>
+                    <td>{{ asistencia.genero }}</td>
+                    <td>{{ asistencia.nie }}</td>
+                    <td>{{ asistencia.fecha }}</td>
+                    <td>{{ asistencia.hora }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-message">No se encontraron registros de entrada.</div>
+        {% endif %}
+    </div>
 
-        <h2>Registro de Salidas</h2>
-        <ul class="record-list">
-            {% for salida in salidas_hoy %}
-            <li>
-                <span>{{ salida.nombre }}</span>
-                <span>{{ salida.codigo }}</span>
-                <span>{{ salida.nie }}</span>
-                <span>{{ salida.fecha }}</span>
-                <span>{{ salida.hora }}</span>
-            </li>
-            {% else %}
-            <li class="empty-message">No se encontraron registros de salida.</li>
-            {% endfor %}
-        </ul>
+    <div class="records-section">
+        <h2 class="section-title">Registro de Salidas</h2>
+        {% if salidas_hoy %}
+        <table class="records-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Código</th>
+                    <th>Género</th>
+                    <th>NIE</th>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for salida in salidas_hoy %}
+                <tr>
+                    <td>{{ salida.nombre }}</td>
+                    <td>{{ salida.codigo }}</td>
+                    <td>{{ salida.genero }}</td>
+                    <td>{{ salida.nie }}</td>
+                    <td>{{ salida.fecha }}</td>
+                    <td>{{ salida.hora }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-message">No se encontraron registros de salida.</div>
+        {% endif %}
     </div>
 </div>
-
 {% endblock %}
