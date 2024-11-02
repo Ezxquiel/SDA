@@ -1,208 +1,643 @@
-*{
-    margin: 0;
-    padding: 0;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
+/* Variables para el menú */
+:root {
+  --menu-bg: #1a5f7a;
+  --menu-hover: #457b9d;
+  --menu-active: #ffd700;
+  --menu-text: #ffffff;
+  --menu-height: 65px;
 }
 
-/* Menu de Navegacion */
-/* adaptado de telefonos*/
+/* Estilos del Header y Navegación */
+header {
+    background: var(--menu-bg);
+    height: var(--menu-height);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
 
-  header {
-    padding: 1px 0;
-    box-shadow: 0 4px 6px rgba(0,0,0,.2);  
-  }
-  .container {
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 100%;
     display: flex;
     align-items: center;
-    justify-content: space-around;
-    padding: 0 20px;
-    max-width: 960px;
-    margin: 0 auto;
-  }
-  .logo-box {
-    float: left;
-    margin-right: 20px;
-    object-fit: cover;
-    width: 50px;
-    height: 50px;
-  }
-  .logo-box a {
-    outline: none;
+    justify-content: space-between;
+    padding: 0 2rem;
+}
+
+/* Logo */
+.logo-box {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo-box img {
+    height: 45px;
+    width: auto;
+    transition: transform 0.3s ease;
+}
+
+.logo-box:hover img {
+    transform: scale(1.05);
+}
+
+/* Navegación Principal */
+nav {
+    height: 100%;
+}
+
+nav ul {
+    display: flex;
+    gap: 0.5rem;
+    height: 100%;
+    align-items: center;
+}
+
+nav li {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+nav a {
+    color: var(--menu-text);
+    text-decoration: none;
+    padding: 0.5rem 1.2rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    position: relative;
+    transition: all 0.3s ease;
+    border-radius: 6px;
+}
+
+/* Efecto hover */
+nav a:before {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 3px;
+    background: var(--menu-active);
+    transition: width 0.3s ease;
+}
+
+nav a:hover:before {
+    width: 80%;
+}
+
+nav a:hover {
+    color: var(--menu-active);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Elemento activo */
+nav a.active {
+    color: var(--menu-bg);
+    background: var(--menu-active);
+}
+
+nav a.active:before {
+    display: none;
+}
+
+/* Menú móvil */
+.menu-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    cursor: pointer;
+    padding: 0.5rem;
+    z-index: 100;
+}
+
+.menu-toggle span {
     display: block;
-  }
-  .logo-box img {
+    width: 28px;
+    height: 2px;
+    background: var(--menu-text);
+    transition: all 0.3s ease;
+    transform-origin: 3px 1px;
+}
+
+/* Animación del menú hamburguesa */
+.menu-toggle.active span:first-child {
+    transform: rotate(45deg);
+}
+
+.menu-toggle.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.menu-toggle.active span:last-child {
+    transform: rotate(-45deg);
+}
+
+/* Media Queries */
+@media screen and (max-width: 768px) {
+    .menu-toggle {
+        display: flex;
+    }
+
+    nav {
+        position: fixed;
+        top: var(--menu-height);
+        left: 0;
+        right: 0;
+        background: var(--menu-bg);
+        padding: 1rem;
+        clip-path: circle(0% at top right);
+        transition: clip-path 0.5s ease-in-out;
+    }
+
+    nav.active {
+        clip-path: circle(150% at top right);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    nav ul {
+        flex-direction: column;
+        gap: 0.8rem;
+        height: auto;
+    }
+
+    nav li {
+        width: 100%;
+        height: auto;
+    }
+
+    nav a {
+        width: 100%;
+        padding: 0.8rem 1.5rem;
+        text-align: center;
+    }
+
+    nav a:before {
+        display: none;
+    }
+
+    nav a:hover {
+        background: var(--menu-hover);
+        color: var(--menu-text);
+    }
+}
+
+/* Animaciones adicionales */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+nav li {
+    animation: slideIn 0.3s ease-out forwards;
+    animation-delay: calc(var(--i) * 0.1s);
+}
+
+/* Efecto de desplazamiento suave */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Variables globales */
+:root {
+  --primary-blue: #1a5f7a;
+  --secondary-blue: #457b9d;
+  --accent-yellow: #ffd700;
+  --light-yellow: #fff7d6;
+  --white: #ffffff;
+  --gray-light: #f8f9fa;
+  --gray: #6c757d;
+  --error-red: #dc3545;
+  --success-green: #28a745;
+}
+
+/* Estilos generales */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: var(--gray-light);
+}
+
+/* Inicio de Web */
+.Inicio-De-Web {
+    max-width: 1200px;
+    min-height: calc(100vh - 80px);
+    margin: 0 auto;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+}
+
+.titulos {
+    flex: 1;
+    text-align: center;
+    padding: 2rem;
+    background: var(--white);
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-left: 5px solid var(--accent-yellow);
+}
+
+.titulos h1 {
+    color: var(--primary-blue);
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+}
+
+.titulos p {
+    color: var(--secondary-blue);
+    font-size: 1.2rem;
+    font-style: italic;
+}
+
+.logodelina {
+    flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
-    height: 100%;
+    padding: 2rem;
+}
+
+.logodelina img {
+    max-width: 100%;
+    height: auto;
+    max-height: 400px;
     object-fit: contain;
-  }
-  nav {
-    overflow: hidden;
-  }
-  ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    float: right;
-  }
-  nav li {
-    display: inline-block;
-    margin-left: 25px;
-    height: 70px;
-    line-height: 70px;
-    transition: .5s linear;
-  }
-  nav a {
-    text-decoration: none;
-    display: block;
-    position: relative;
-    color: #000000;
-    text-transform: uppercase;
-  }
-  nav a:after {
-    color: black;
-    content: "";
-    width: 0;
-    height: 2px;
-    position: absolute;
-    left: 0;
-    bottom: 15px;
-    background: #000000;
-    transition: width .5s linear;  
-  }
-  nav a:hover:after {width: 100%;}
-  
-  @media screen and (max-width: 660px) {
-    header {text-align: center;}
-    .logo-box {
-      float: none;
-      display: inline-block;
-      margin: 0 0 16px 0;
-    }
-    ul {float: none;}
-    nav li:first-of-type {margin-left: 0;}
-  }
-  @media screen and (max-width: 550px) {
-  nav {overflow: visible;}
-  nav li {
-    display: block;
-    margin: 0;
-    height: 40px;
-    line-height: 40px;
-  }
-  nav li:hover {background: rgba(0,0,0,.1);}
-  nav a:after {content: none;}
-  }
-
-/* Inicio de web */
-
-.Inicio-De-Web{
-  margin: 0 auto;
-  width: 90%;
-  height: 80vh;
-  display: flex;
-  justify-content: space-between;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
 }
 
-.Inicio-De-Web .titulos{
-  width: 50%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+/* Formulario de Registro */
+.Formulario {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: var(--white);
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-top: 5px solid var(--accent-yellow);
 }
 
-.titulos h1{
-  font-size: 40px;
-  text-align: center;
-}
-
-.titulos p{
-  text-align: center;
-}
-
-.Inicio-De-Web .logodelina{
-  width: 50%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.logodelina img{
-  object-fit: contain;
-}
-
-@media screen and (max-width: 720px){
-  .Inicio-De-Web{
-    width: 80%;
-    margin-top: 10px;
+.Formulario form {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: space-evenly;
-  }
-  .titulos h1{
-    width: 100%;
-    margin-top: 10px;
-  }
-  .logodelina{
-    width: 100%;
-    margin-top: 10px;
-  }
-}
-
-/*Formulario*/
-
-/* Formulario */
-.Formulario {
-  margin: 5% auto;
-  padding: 20px; /* Increased padding for better spacing */
-  display: flex;
-  flex-direction: column;
-  width: 400px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5); /* Softer shadow */
-  border-radius: 10px;
-  background-color: #f9f9f9; /* Light background for better contrast */
+    gap: 1rem;
 }
 
 .Formulario label {
-  margin: 5px 0; /* Reduced margin for better alignment */
-  font-weight: bold; /* Make labels bold for better readability */
+    color: var(--primary-blue);
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    font-size: 0.95rem;
 }
 
-.Formulario input, .Formulario select {
-  width: 98%; /* Full width inputs and selects */
-  height: 35px; /* Increased height for easier clicking */
-  margin: 10px 0; /* Consistent vertical spacing */
-  padding-left: 10px;
-  border: 1px solid #ccc; /* Subtle border */
-  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2); /* Softer shadow */
-  border-radius: 5px;
-  transition: box-shadow 0.3s ease; /* Smooth transition effect */
+.Formulario input,
+.Formulario select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: var(--white);
 }
 
-.Formulario input:focus, .Formulario select:focus {
-  outline: none;
-  box-shadow: 0px 0px 10px rgb(0, 0, 0); /* Stronger shadow on focus */
+.Formulario input:focus,
+.Formulario select:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(26, 95, 122, 0.1);
 }
 
 .Formulario button {
-  width: 100%; /* Full-width button */
-  height: 40px; /* Increased height */
-  border: none; /* Remove border */
-  background-color: #000000; /* Green background */
-  color: white; /* White text */
-  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3); /* Softer shadow */
-  border-radius: 5px;
-  margin-top: 15px;
-  cursor: pointer; /* Pointer cursor */
-  transition: background-color 0.3s ease; /* Smooth background transition */
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--primary-blue);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 .Formulario button:hover {
-  background-color: #555555; /* Darker green on hover */
+    background: var(--secondary-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Mensajes Flash */
+.flashes {
+    list-style: none;
+    max-width: 600px;
+    margin: 1rem auto;
+    padding: 0;
+}
+
+.flashes li {
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    text-align: center;
+}
+
+.flashes .success {
+    background-color: #d4edda;
+    color: var(--success-green);
+    border: 1px solid #c3e6cb;
+}
+
+.flashes .error {
+    background-color: #f8d7da;
+    color: var(--error-red);
+    border: 1px solid #f5c6cb;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .Inicio-De-Web {
+        flex-direction: column;
+        padding: 1rem;
+        min-height: auto;
+    }
+
+    .titulos h1 {
+        font-size: 1.8rem;
+    }
+
+    .titulos p {
+        font-size: 1rem;
+    }
+
+    .logodelina {
+        padding: 1rem;
+    }
+
+    .logodelina img {
+        max-height: 300px;
+    }
+
+    .Formulario {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.Inicio-De-Web > div {
+    animation: fadeIn 0.8s ease-out forwards;
+}
+
+.Formulario {
+    animation: fadeIn 0.6s ease-out forwards;
+}
+
+/* Mejoras de accesibilidad */
+.Formulario input:invalid,
+.Formulario select:invalid {
+    border-color: #ffcdcd;
+}
+
+.Formulario input:required,
+.Formulario select:required {
+    background-image: radial-gradient(circle at right 0.5em center, var(--accent-yellow) 0.25em, transparent 0.25em);
+    background-repeat: no-repeat;
+}
+
+
+/* Variables adicionales para la administración */
+:root {
+  --menu-bg: #1a5f7a;
+  --menu-hover: #457b9d;
+  --menu-active: #ffd700;
+  --menu-text: #ffffff;
+  --menu-height: 65px;
+  --border-radius: 8px;
+  --transition: all 0.3s ease;
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+}
+
+/* Estilos para el contenedor de administración */
+.admin-container {
+  max-width: 1400px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+.page-title {
+  color: var(--menu-bg);
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 3px solid var(--menu-active);
+}
+
+/* Formulario de búsqueda */
+.search-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+}
+
+.search-form input {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: var(--border-radius);
+  font-size: 0.95rem;
+  transition: var(--transition);
+}
+
+.search-form input:focus {
+  border-color: var(--menu-bg);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(26, 95, 122, 0.1);
+}
+
+.btn-search, .btn-download {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-search {
+  background: var(--menu-bg);
+  color: white;
+}
+
+.btn-download {
+  background: var(--menu-active);
+  color: var(--menu-bg);
+}
+
+.btn-search:hover, .btn-download:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Sección de registros */
+.records-section {
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  margin-bottom: 2rem;
+  overflow: hidden;
+}
+
+.section-title {
+  padding: 1.5rem;
+  margin: 0;
+  background: var(--menu-bg);
+  color: white;
+  font-size: 1.25rem;
+}
+
+.records-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+}
+
+.records-table th,
+.records-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.records-table th {
+  background: #f8f9fa;
+  font-weight: 600;
+  color: var(--menu-bg);
+}
+
+.records-table tr:hover {
+  background: #f8f9fa;
+}
+
+.empty-message {
+  padding: 2rem;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
+
+/* Menú de navegación mejorado */
+.nav-admin {
+  background: var(--menu-bg);
+  padding: 0 1rem;
+}
+
+.nav-admin ul {
+  display: flex;
+  gap: 1rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-admin li {
+  position: relative;
+}
+
+.nav-admin a {
+  display: flex;
+  align-items: center;
+  padding: 1.25rem 1rem;
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.nav-admin a:hover {
+  background: var(--menu-hover);
+}
+
+.nav-admin a.active {
+  background: var(--menu-active);
+  color: var(--menu-bg);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .search-form {
+    grid-template-columns: 1fr;
+  }
+  
+  .records-table {
+    display: block;
+    overflow-x: auto;
+  }
+  
+  .btn-search, .btn-download {
+    width: 100%;
+  }
+  
+  .nav-admin {
+    overflow-x: auto;
+  }
+  
+  .nav-admin ul {
+    width: max-content;
+    padding: 0.5rem;
+  }
+}
+
+/* Animaciones */
+.records-section {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
