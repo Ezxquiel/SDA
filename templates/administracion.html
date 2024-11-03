@@ -16,6 +16,51 @@
         </button>
     </form>
 
+
+    <div class="records-section">
+        <h2 class="section-title">RESUMEN</h2>
+        {% if resumen %}
+        <table class="records-table">
+            <thead>
+                <tr>
+                    <th>Sección</th>
+                    <th>Asistidos</th>
+                    <th>M</th>
+                    <th>F</th>
+                    <th>Inasistidos</th>
+                    <th>Total</th>
+                    <th>Código de los inasistidos</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for asistencia in resumen %}
+                <tr>
+                    <td>{{ asistencia.año }} - {{ asistencia.seccion }}</td>
+                    <td>{{ asistencia.total_asistidos }}</td>
+                    <td>{{ asistencia.total_masculino }}</td>
+                    <td>{{ asistencia.total_femenino }}</td>
+                    <td>{{ asistencia.total_inasistidos or 0 }}</td>
+                    <td>{{ asistencia.total or (asistencia.total_asistidos + asistencia.total_inasistidos) }}</td>
+                    <td>{{ asistencia.codigos_inasistidos or 'N/A' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-message">No se encontraron Registro</div>
+        {% endif %}
+    </div>
+
+    <div class="records-section">
+        <h3>Total de Asistencias</h3>
+        <ul>
+            {% for conteo in conteo_genero %}
+            <li>{{ conteo.genero_normalizado }}: {{ conteo.total }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    
+
     <div class="records-section">
         <h2 class="section-title">Registro de Entradas</h2>
         {% if asistencias_hoy %}
@@ -79,5 +124,6 @@
         <div class="empty-message">No se encontraron registros de salida.</div>
         {% endif %}
     </div>
+ 
 </div>
 {% endblock %}
