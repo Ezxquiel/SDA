@@ -3,12 +3,12 @@ from flask import Flask, request, flash, redirect, url_for, render_template, mak
 from router import routers as rt
 import pymysql
 from pymysql.cursors import DictCursor
-from fpdf import FPDF
 from functools import wraps
 from datetime import datetime
 import calendar 
 from io import BytesIO
 import os
+import socket
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24) #llave random para que funcione ALV 
@@ -557,6 +557,11 @@ def generar_pdf(entrada, salidas, mes=None, año=None):
     
     return response
 
+# Obtiene la IP local de la máquina
+hostname = socket.gethostname()
+local_ip = socket.gethostbyname(hostname)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    print(f"Servidor Flask ejecutándose en http://{local_ip}:5000")
+    # Ejecuta Flask en todas las interfaces
+    app.run( debug=True, host='0.0.0.0', port=5000)

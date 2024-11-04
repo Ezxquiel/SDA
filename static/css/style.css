@@ -1,104 +1,168 @@
-*{
-    margin: 0;
-    padding: 0;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
+* {
+  margin: 0;
+  padding: 0;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
-/* Menu de Navegacion */
-/* adaptado de telefonos*/
+@import url('https://fonts.googleapis.com/css?family=Varela+Round');
 
-  header {
-    padding: 1px 0;
-    box-shadow: 0 4px 6px rgba(0,0,0,.2);  
+.header {
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 100%;
+  box-shadow: none;
+  height: 60px;
+  overflow: hidden;
+  z-index: 10;
+  background-color: #ffffff; /* Fondo blanco para el encabezado */
+}
+
+.main {
+  margin: 0 auto;
+  display: block;
+  height: 100%;
+  margin-top: 60px;
+}
+
+.mainInner {
+  display: table;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+}
+
+.mainInner div {
+  display: table-cell;
+  vertical-align: middle;
+  font-size: 2em;
+  font-weight: bold;
+  letter-spacing: 1.25px;
+  color: #ffffff; /* Color del texto principal */
+}
+
+#sidebarMenu {
+  height: 100%;
+  position: fixed;
+  left: 0;
+  width: 250px;
+  margin-top: 60px;
+  transform: translateX(-250px);
+  transition: transform 250ms ease-in-out;
+  background-color: #fff; /* Fondo blanco para el menú lateral */
+  color: #000000; /* Color del texto negro en el menú */
+}
+
+
+.sidebarMenuInner li {
+  list-style: none;
+  color: #000; /* Color negro para el texto de los enlaces */
+  text-transform: uppercase;
+  font-weight: bold;
+  padding: 20px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.10);
+}
+
+.sidebarMenuInner li span {
+  display: block;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.50); /* Color del subtítulo */
+}
+
+.sidebarMenuInner li a {
+  color: #000; /* Color negro para los enlaces */
+  text-transform: uppercase;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+input[type="checkbox"]:checked ~ #sidebarMenu {
+  transform: translateX(0);
+}
+
+input[type=checkbox] {
+  transition: all 0.3s;
+  box-sizing: border-box;
+  display: none;
+}
+
+.sidebarIconToggle {
+  transition: all 0.3s;
+  box-sizing: border-box;
+  cursor: pointer;
+  position: absolute;
+  z-index: 99;
+  height: 20px;
+  width: 20px;
+  top: 22px;
+  left: 15px;
+}
+
+.spinner {
+  transition: all 0.3s;
+  box-sizing: border-box;
+  position: absolute;
+  height: 3px;
+  width: 100%;
+  background-color: #000; /* Color negro para los íconos de menú */
+}
+
+.horizontal {
+  transition: all 0.3s;
+  box-sizing: border-box;
+  position: relative;
+  float: left;
+  margin-top: 3px;
+}
+
+.diagonal.part-1 {
+  position: relative;
+  transition: all 0.3s;
+  box-sizing: border-box;
+  float: left;
+}
+
+.diagonal.part-2 {
+  transition: all 0.3s;
+  box-sizing: border-box;
+  position: relative;
+  float: left;
+  margin-top: 3px;
+}
+
+input[type=checkbox]:checked ~ .sidebarIconToggle > .horizontal {
+  transition: all 0.3s;
+  box-sizing: border-box;
+  opacity: 0; /* Desaparece el ícono horizontal al abrir el menú */
+}
+
+input[type=checkbox]:checked ~ .sidebarIconToggle > .diagonal.part-1 {
+  transition: all 0.3s;
+  box-sizing: border-box;
+  transform: rotate(135deg); /* Rota el ícono diagonal */
+  margin-top: 8px;
+}
+
+input[type=checkbox]:checked ~ .sidebarIconToggle > .diagonal.part-2 {
+  transition: all 0.3s;
+  box-sizing: border-box;
+  transform: rotate(-135deg); /* Rota el otro ícono diagonal */
+  margin-top: -9px;
+}
+
+/* Estilos específicos para dispositivos móviles */
+@media screen and (max-width: 720px) {
+  #sidebarMenu {
+    height: 100vh; /* Ocupa el 100% de la altura de la ventana */
+    top: 0; /* Asegúrate de que esté en la parte superior */
   }
-  .container {
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    padding: 0 20px;
-    max-width: 960px;
-    margin: 0 auto;
-  }
-  .logo-box {
-    float: left;
-    margin-right: 20px;
-    object-fit: cover;
-    width: 50px;
-    height: 50px;
-  }
-  .logo-box a {
-    outline: none;
-    display: block;
-  }
-  .logo-box img {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-  nav {
-    overflow: hidden;
-  }
-  ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    float: right;
-  }
-  nav li {
-    display: inline-block;
-    margin-left: 25px;
-    height: 70px;
-    line-height: 70px;
-    transition: .5s linear;
-  }
-  nav a {
-    text-decoration: none;
-    display: block;
-    position: relative;
-    color: #000000;
-    text-transform: uppercase;
-  }
-  nav a:after {
-    color: black;
-    content: "";
-    width: 0;
-    height: 2px;
-    position: absolute;
-    left: 0;
-    bottom: 15px;
-    background: #000000;
-    transition: width .5s linear;  
-  }
-  nav a:hover:after {width: 100%;}
-  
-  @media screen and (max-width: 660px) {
-    header {text-align: center;}
-    .logo-box {
-      float: none;
-      display: inline-block;
-      margin: 0 0 16px 0;
-    }
-    ul {float: none;}
-    nav li:first-of-type {margin-left: 0;}
-  }
-  @media screen and (max-width: 550px) {
-  nav {overflow: visible;}
-  nav li {
-    display: block;
-    margin: 0;
-    height: 40px;
-    line-height: 40px;
-  }
-  nav li:hover {background: rgba(0,0,0,.1);}
-  nav a:after {content: none;}
-  }
+}
+
 
 /* Inicio de web */
-
-.Inicio-De-Web{
+.Inicio-De-Web {
   margin: 0 auto;
   width: 90%;
   height: 80vh;
@@ -106,7 +170,7 @@
   justify-content: space-between;
 }
 
-.Inicio-De-Web .titulos{
+.Inicio-De-Web .titulos {
   width: 50%;
   height: 100%;
   display: flex;
@@ -115,16 +179,16 @@
   align-items: center;
 }
 
-.titulos h1{
+.titulos h1 {
   font-size: 40px;
   text-align: center;
 }
 
-.titulos p{
+.titulos p {
   text-align: center;
 }
 
-.Inicio-De-Web .logodelina{
+.Inicio-De-Web .logodelina {
   width: 50%;
   height: 100%;
   display: flex;
@@ -132,30 +196,29 @@
   align-items: center;
 }
 
-.logodelina img{
+.logodelina img {
   object-fit: contain;
 }
 
-@media screen and (max-width: 720px){
-  .Inicio-De-Web{
-    width: 80%;
-    margin-top: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-evenly;
+@media screen and (max-width: 720px) {
+  .Inicio-De-Web {
+      width: 80%;
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-evenly;
   }
-  .titulos h1{
-    width: 100%;
-    margin-top: 10px;
+
+  .titulos h1 {
+      margin-top: 10px;
   }
-  .logodelina{
-    width: 100%;
-    margin-top: 10px;
+
+  .logodelina {
+      width: 100%;
+      margin-top: 10px;
   }
 }
-
-/*Formulario*/
 
 /* Formulario */
 .Formulario {
@@ -174,7 +237,8 @@
   font-weight: bold; /* Make labels bold for better readability */
 }
 
-.Formulario input, .Formulario select {
+.Formulario input,
+.Formulario select {
   width: 98%; /* Full width inputs and selects */
   height: 35px; /* Increased height for easier clicking */
   margin: 10px 0; /* Consistent vertical spacing */
@@ -185,7 +249,8 @@
   transition: box-shadow 0.3s ease; /* Smooth transition effect */
 }
 
-.Formulario input:focus, .Formulario select:focus {
+.Formulario input:focus,
+.Formulario select:focus {
   outline: none;
   box-shadow: 0px 0px 10px rgb(0, 0, 0); /* Stronger shadow on focus */
 }
@@ -194,8 +259,8 @@
   width: 100%; /* Full-width button */
   height: 40px; /* Increased height */
   border: none; /* Remove border */
-  background-color: #000000; /* Green background */
-  color: white; /* White text */
+  background-color: #000; /* Fondo negro */
+  color: white; /* Texto blanco */
   box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3); /* Softer shadow */
   border-radius: 5px;
   margin-top: 15px;
@@ -204,5 +269,5 @@
 }
 
 .Formulario button:hover {
-  background-color: #555555; /* Darker green on hover */
+  background-color: #555555; /* Darker on hover */
 }
