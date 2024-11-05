@@ -1,0 +1,50 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+ <div class="admin-container">
+    <h1 class="page-title">Administración Vespertina</h1>
+    <form class="search-form" method="POST" action="/admintardePM">
+
+    <input type="text" name = "busqueda" placeholder = "Buscar por sección" requiered autocomplete="off" autofocus>
+    <Input type="date" name = fecha_inicio  placeholder = "Fecha Inicio"> </Input>
+    <Input type="date" name = fecha_fin  placeholder = "Fecha Fin"> </Input>
+    <button type="submit" class="btn-search">Buscar</button>
+
+    </form>
+    <div class="Records--section">
+        <h2 class="section-title">Resumen</h2>
+        {% if resumen %}
+        <table class="records-table">
+            <thead>
+                <tr>
+                    <th>Sección</th>
+                    <th>Asistidos</th>
+                    <th>M</th>
+                    <th>F</th>
+                    <th>Inasistidos</th>
+                    <th>Total</th>
+                    <th>Codigos de inasistidos</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                {% for asistencia in resumen %}
+                <tr>
+                    <td>{{ asistencia.año }} - {{ asistencia.seccion }} </td>
+                    <td>{{  asistencia.total_asistidos }}</td>
+                    <td>{{  asistencia.total_masculino }}</td>
+                    <td>{{  asistencia.total_femenino }}</td>
+                    <td>{{  asistencia.total_inasistidos or 0 }}</td>
+                    <td>{{  asistencia.total or (asistencia.total_asistidos + asistencia.total_inasistidos) }}</td>
+                    <td>{{  asistencia.codigos_inasistidos or 'N/A' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-message">No se encontraron registros</div>
+        {% endif %}
+    </div>
+ </div>
+
+{% endblock %}
