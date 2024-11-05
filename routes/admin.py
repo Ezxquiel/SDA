@@ -6,7 +6,7 @@ from datetime import datetime
 
 admin_bp = Blueprint('admin', __name__)
 
-@admin_bp.route('/administracion', methods=['GET', 'POST'])
+@admin_bp.route('/administracionM', methods=['GET', 'POST'])
 def administracion():
     try:
         conn = get_db_connection()
