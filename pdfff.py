@@ -66,3 +66,4 @@ generar_pdf(resumen_data)
 # Cerrar conexión
 cursor.close()
 conexion.close()
+
