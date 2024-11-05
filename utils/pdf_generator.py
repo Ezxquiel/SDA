@@ -1,161 +1,102 @@
-
 # utils/pdf_generator.py
 from fpdf import FPDF
 from datetime import datetime
-import calendar
-from flask import make_response
 
-class AttendanceReport:
-    def __init__(self, entrada, salidas, mes=None, año=None):
-        self.entrada = entrada
-        self.salidas = salidas
-        self.mes = mes
-        self.año = año
-        self.pdf = FPDF()
-        self._init_dates()
+class AttendanceReport(FPDF):
+    def __init__(self):
+        super().__init__()
+        self.set_auto_page_break(auto=True, margin=15)
+        self.add_page()
+        self.set_font('Arial', 'B', 16)
         
-    def _init_dates(self):
-        if self.mes is None or self.año is None and self.entrada:
-            primera_fecha = datetime.strptime(str(self.entrada[0]['fecha']), '%Y-%m-%d')
-            self.mes = self.mes or primera_fecha.month
-            self.año = self.año or primera_fecha.year
-        else:
-            ahora = datetime.now()
-            self.mes = self.mes or ahora.month
-            self.año = self.año or ahora.year
-
-    def generate(self):
-        self.pdf.add_page()
-        self._add_header()
-        self._add_calendar()
-        self._add_tables()
-        self._add_footer()
+    def header(self):
+        # Logo o imagen institucional (opcional)
+        # self.image('logo.png', 10, 8, 33)
+        self.set_font('Arial', 'B', 16)
+        self.cell(0, 10, 'Reporte de Asistencia - Turno Matutino', 0, 1, 'C')
+        self.ln(10)
         
-        response = make_response(self.pdf.output(dest='S').encode('latin-1'))
-        response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = 'attachment; filename=Reporte_Asistencia_Salida.pdf'
-        return response
-
-    def _add_header(self):
-        self.pdf.set_font('Arial', 'B', 50)
-        self.pdf.set_text_color(200, 200, 200)
-        self.pdf.rotate(45, 105, 140)
-        self.pdf.text(75, 140, 'ASISTENCIAS')
-        self.pdf.rotate(0)
-        self.pdf.set_text_color(0, 0, 0)
-
-        self.pdf.image('static/img/logoInaSinFondo.png', x=10, y=10, w=40, h=40)
-
-        self.pdf.set_font('Arial', 'B', 16)
-        self.pdf.cell(0, 70, 'Reporte de Asistencia'.encode('latin-1').decode('latin-1'), 0, 1, 'C')
-
-    def _add_calendar(self):
-        self.pdf.ln(10)
-        self.pdf.set_font('Arial', 'B', 12)
-        self.pdf.cell(200, 10, 'Calendario de Asistencias'.encode('latin-1').decode('latin-1'), ln=True, align='C')
-
-        fechas_asistidas = {str(entrada['fecha']): True for entrada in self.entrada}
-        calendar.setfirstweekday(calendar.SUNDAY)
-        mes_cal = calendar.monthcalendar(self.año, self.mes)
-
-        nombres_meses = {
-            1: 'Enero', 2: 'Febrero', 3: 'Marzo', 4: 'Abril',
-            5: 'Mayo', 6: 'Junio', 7: 'Julio', 8: 'Agosto',
-            9: 'Septiembre', 10: 'Octubre', 11: 'Noviembre', 12: 'Diciembre'
-        }
-
-        self.pdf.set_fill_color(51, 122, 183)
-        self.pdf.set_text_color(255, 255, 255)
-        nombre_mes = nombres_meses[self.mes].encode('latin-1').decode('latin-1')
-        self.pdf.cell(0, 10, f"{nombre_mes} {self.año}", 1, 1, 'C', True)
-
-        dias = ['Dom', 'Lun', 'Mar', 'Mié'.encode('latin-1').decode('latin-1'), 
-                'Jue', 'Vie', 'Sáb'.encode('latin-1').decode('latin-1')]
+    def footer(self):
+        self.set_y(-15)
+        self.set_font('Arial', 'I', 8)
+        self.cell(0, 10, f'Página {self.page_no()}/{{nb}}', 0, 0, 'C')
         
-        self.pdf.set_font('Arial', 'B', 10)
-        self.pdf.set_fill_color(240, 240, 240)
-        self.pdf.set_text_color(0, 0, 0)
+    def set_header_info(self, fecha_inicio, fecha_fin):
+        self.set_font('Arial', '', 12)
+        self.cell(0, 10, f'Período: {fecha_inicio} - {fecha_fin}', 0, 1, 'L')
+        self.ln(5)
         
-        for dia in dias:
-            self.pdf.cell(27, 10, dia, 1, 0, 'C', True)
-        self.pdf.ln()
+    def add_table_header(self):
+        # Configurar encabezados de la tabla
+        self.set_font('Arial', 'B', 10)
+        self.set_fill_color(200, 200, 200)
+        
+        # Definir anchos de columnas
+        col_widths = [15, 20, 25, 20, 20, 25, 35, 35]
+        headers = ['Año', 'Sección', 'Total\nAsistidos', 'Masculino', 'Femenino', 
+                  'Inasistidos', 'Códigos\nInasistidos', 'Códigos\nAsistidos']
+        
+        for i, header in enumerate(headers):
+            self.cell(col_widths[i], 10, header, 1, 0, 'C', True)
+        self.ln()
+        
+        return col_widths
+        
+    def add_row(self, data, col_widths):
+        self.set_font('Arial', '', 9)
+        
+        # Calcular altura máxima necesaria para la fila
+        max_height = 8
+        for i, content in enumerate(data):
+            if i >= 6:  # Para las columnas de códigos
+                needed_height = self.get_string_height(col_widths[i], str(content))
+                max_height = max(max_height, needed_height)
+        
+        # Imprimir cada celda con la altura calculada
+        for i, content in enumerate(data):
+            align = 'C' if i < 6 else 'L'  # Alineación centrada excepto para códigos
+            self.multi_cell(col_widths[i], max_height, str(content), 1, align, False) 
+            if i < len(data) - 1:  # Si no es la última celda
+                self.set_xy(self.get_x() + col_widths[i], self.get_y() - max_height)
+        
+        self.ln()
+        
+    def get_string_height(self, width, txt):
+        # Calcula la altura necesaria para el texto
+        lines = len(txt.split('\n'))
+        return max(8, lines * 4)  # Mínimo 8 pts, o más si hay múltiples líneas
 
-        total_asistidos = 0
-        total_no_asistidos = 0
-        dias_habiles = 0
-
-        self.pdf.set_font('Arial', '', 10)
-        for semana in mes_cal:
-            for i, dia in enumerate(semana):
-                if dia == 0:
-                    self.pdf.set_fill_color(245, 245, 245)
-                    self.pdf.cell(27, 10, '', 1, 0, 'C', True)
-                else:
-                    dia_str = f"{self.año}-{self.mes:02d}-{dia:02d}"
-                    if i != 0:
-                        dias_habiles += 1
-                        if dia_str in fechas_asistidas:
-                            self.pdf.set_fill_color(223, 240, 216)
-                            self.pdf.set_text_color(0, 128, 0)
-                            total_asistidos += 1
-                        else:
-                            self.pdf.set_fill_color(242, 222, 222)
-                            self.pdf.set_text_color(169, 68, 66)
-                            total_no_asistidos += 1
-                    else:
-                        self.pdf.set_fill_color(220, 220, 220)
-                        self.pdf.set_text_color(128, 128, 128)
-                    
-                    self.pdf.cell(27, 10, str(dia), 1, 0, 'C', True)
-                    self.pdf.set_text_color(0, 0, 0)
-            self.pdf.ln()
-
-        self.pdf.ln(10)
-        self.pdf.set_font('Arial', 'B', 10)
-        self.pdf.set_fill_color(240, 240, 240)
-        self.pdf.cell(63, 10, f'Días Hábiles: {dias_habiles}'.encode('latin-1').decode('latin-1'), 1, 0, 'C', True)
-        self.pdf.cell(63, 10, f'Días Asistidos: {total_asistidos}'.encode('latin-1').decode('latin-1'), 1, 0, 'C', True)
-        self.pdf.cell(64, 10, f'Días No Asistidos: {total_no_asistidos}'.encode('latin-1').decode('latin-1'), 1, 1, 'C', True)
-
-    def _add_tables(self):
-        def crear_tabla(titulo, datos, es_entrada=True):
-            self.pdf.ln(10)
-            self.pdf.set_font('Arial', 'B', 12)
-            self.pdf.set_fill_color(51, 122, 183)
-            self.pdf.set_text_color(255, 255, 255)
-            self.pdf.cell(190, 10, titulo.encode('latin-1').decode('latin-1'), 1, 1, 'C', True)
-            
-            self.pdf.set_font('Arial', 'B', 8)
-            self.pdf.set_fill_color(240, 240, 240)
-            self.pdf.set_text_color(0, 0, 0)
-            headers = [
-                ('ID', 20),
-                ('NIE Estudiante', 30),
-                ('Nombre', 50),
-                ('Fecha', 45),
-                ('Hora', 45)
+def generate_pdf(resumen, fecha_inicio, fecha_fin):
+    try:
+        pdf = AttendanceReport()
+        pdf.alias_nb_pages()
+        
+        # Configurar información del encabezado
+        pdf.set_header_info(
+            fecha_inicio.strftime('%d/%m/%Y'),
+            fecha_fin.strftime('%d/%m/%Y')
+        )
+        
+        # Agregar encabezados de la tabla
+        col_widths = pdf.add_table_header()
+        
+        # Agregar filas de datos
+        for row in resumen:
+            row_data = [
+                row[0],  # año
+                row[1],  # seccion
+                row[2],  # total_asistidos
+                row[3],  # masculino
+                row[4],  # femenino
+                row[5],  # inasistidos
+                row[6] if row[6] else 'Ninguno',  # codigos_inasistidos
+                row[7] if row[7] else 'Ninguno'   # codigos_asistidos
             ]
+            pdf.add_row(row_data, col_widths)
             
-            for header, width in headers:
-                self.pdf.cell(width, 10, header.encode('latin-1').decode('latin-1'), 1, 0, 'C', True)
-            self.pdf.ln()
-            
-            self.pdf.set_font('Arial', '', 8)
-            for i, dato in enumerate(datos):
-                self.pdf.set_fill_color(255, 255, 255) if i % 2 == 0 else self.pdf.set_fill_color(245, 245, 245)
-                
-                id_key = 'id_entrada' if es_entrada else 'id_salida'
-                self.pdf.cell(20, 10, str(dato[id_key]), 1, 0, 'C', True)
-                self.pdf.cell(30, 10, str(dato['nie']), 1, 0, 'C', True)
-                nombre_codificado = dato['nombre'].encode('latin-1').decode('latin-1')
-                self.pdf.cell(50, 10, nombre_codificado, 1, 0, 'L', True)
-                self.pdf.cell(45, 10, str(dato['fecha']), 1, 0, 'C', True)
-                self.pdf.cell(45, 10, str(dato['hora']), 1, 1, 'C', True)
-
-        crear_tabla('Registro de Entradas', self.entrada, True)
-        crear_tabla('Registro de Salidas', self.salidas, False)
-
-    def _add_footer(self):
-        self.pdf.set_y(-30)
-        self.pdf.set_font('Arial', 'I', 8)
-        self.pdf.cell(0, 10, f'Generado el {datetime.now().strftime("%d/%m/%Y %H:%M:%S")}'.encode('latin-1').decode('latin-1'), 0, 0, 'C')
+        # Generar PDF en memoria
+        return pdf.output(dest='S').encode('latin1')
+        
+    except Exception as e:
+        print(f"Error generando PDF: {str(e)}")
+        raise

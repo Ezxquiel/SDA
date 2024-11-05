@@ -1,0 +1,50 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="admin-container">
+    <h1 class="page-title">Administración Matutina</h1>
+
+    <form class="search-form" method="POST" action="/administracionAM" >
+        <input type="text" name="busqueda" placeholder="Buscar Por Sección...." required autocomplete="off" autofocus>
+        <input type="date" name="fecha_inicio" placeholder="Fecha Inicio">
+        <input type="date" name="fecha_fin" placeholder="Fecha fin">
+        <button name="descargar_pdf" value="true" class="btn-download">Descargar PDF</button>
+        <button type="submit" class="btn-search">Buscar</button>
+    </form>
+
+    <div class="records-section">
+        <h2 class="section-title">Resumen</h2>
+        {% if resumen %}
+        <table class="records-table">
+            <thead>
+                <tr>
+                    <th>Sección</th>
+                    <th>Asistidos</th>
+                    <th>M</th>
+                    <th>F</th>
+                    <th>inasistidos</th>
+                    <th>Total</th>
+                    <th>codigo de los inasistidos</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for asistencia in resumen %}
+                <tr>
+                    <td>{{ asistencia.año }} - {{ asistencia.seccion }}</td>
+                    <td>{{ asistencia.total_asistidos }}</td>
+                    <td>{{ asistencia.total_masculino }}</td>
+                    <td>{{ asistencia.total_femenino }}</td>
+                    <td>{{ asistencia.total_inasistidos or 0 }}</td>
+                    <td>{{ asistencia.total or (asistencia.total_asistidos + asistencia.total_inasistidos) }}</td>
+                    <td style="display: flex; overflow-x: scroll; width: 290px;">{{ asistencia.codigos_inasistidos or 'N/A' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-message">No se encontraron Registros</div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
