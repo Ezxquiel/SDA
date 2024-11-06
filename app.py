@@ -1,4 +1,3 @@
-# app.py
 from flask import Flask, render_template
 from config.config import Config
 from routes.students import students_bp
@@ -21,10 +20,11 @@ app.register_blueprint(sections_bp)
 app.register_blueprint(admintarde_bp)
 app.register_blueprint(admin_mañana_bp)
 
+
 @app.route('/')
 @app.route('/home')
 def home():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(debug=True)

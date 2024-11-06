@@ -1,17 +1,21 @@
 {% extends 'layout.html' %}
 
 {% block content %}
- <div class="admin-container">
+
+
+<div class="admin-container">
     <h1 class="page-title">Administración Vespertina</h1>
-    <form class="search-form" method="POST" action="/admintardePM">
 
-    <input type="text" name = "busqueda" placeholder = "Buscar por sección" requiered autocomplete="off" autofocus>
-    <Input type="date" name = fecha_inicio  placeholder = "Fecha Inicio"> </Input>
-    <Input type="date" name = fecha_fin  placeholder = "Fecha Fin"> </Input>
-    <button type="submit" class="btn-search">Buscar</button>
-
+    <form class="search-form" method="POST" action="/admintardePM" >
+        <input type="text" name="busqueda" placeholder="Buscar Por Sección...." autocomplete="off" autofocus>
+        <input type="date" name="fecha_inicio" placeholder="Fecha Inicio">
+        <input type="date" name="fecha_fin" placeholder="Fecha fin">
+        <button name="descargar_pdf" value="true" class="btn-download">Descargar PDF</button>
+        <button type="submit" class="btn-search">Buscar</button>
+        <button type="submit" class="btn btn-secondary" name="mostrar_todo" value="1">Ver Todas las Secciones</button>
     </form>
-    <div class="Records--section">
+
+    <div class="records-section">
         <h2 class="section-title">Resumen</h2>
         {% if resumen %}
         <table class="records-table">
@@ -23,28 +27,82 @@
                     <th>F</th>
                     <th>Inasistidos</th>
                     <th>Total</th>
-                    <th>Codigos de inasistidos</th>
-
+                    <th>Códigos de Inasistidos</th>
                 </tr>
             </thead>
             <tbody>
                 {% for asistencia in resumen %}
                 <tr>
-                    <td>{{ asistencia.año }} - {{ asistencia.seccion }} </td>
-                    <td>{{  asistencia.total_asistidos }}</td>
-                    <td>{{  asistencia.total_masculino }}</td>
-                    <td>{{  asistencia.total_femenino }}</td>
-                    <td>{{  asistencia.total_inasistidos or 0 }}</td>
-                    <td>{{  asistencia.total or (asistencia.total_asistidos + asistencia.total_inasistidos) }}</td>
-                    <td>{{  asistencia.codigos_inasistidos or 'N/A' }}</td>
+                    <td>{{ asistencia.año }} - {{ asistencia.seccion }}</td>
+                    <td>{{ asistencia.total_asistidos }}</td>
+                    <td>{{ asistencia.total_masculino }}</td>
+                    <td>{{ asistencia.total_femenino }}</td>
+                    <td>{{ asistencia.total_inasistidos or 0 }}</td>
+                    <td>{{ asistencia.total_asistidos + asistencia.total_inasistidos }}</td> <!-- Total calculado -->
+                    <td style="overflow-x: auto; max-width: 290px;">{{ asistencia.codigos_inasistidos or 'N/A' }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
         {% else %}
-        <div class="empty-message">No se encontraron registros</div>
+        <div class="empty-message">No se encontraron Registros</div>
         {% endif %}
     </div>
- </div>
+
+    <div class="records-table">
+        <h2 class="section-title">Estadistica General Vespertina</h2>
+        {% if totales %}
+        <table class="table mt-4">
+            <thead>
+                <tr>
+                    <th colspan="7" class="text-center">Totales del Turno</th>
+                </tr>
+                <tr>
+                    <th>Total Asistidos</th>
+                    <th>Total Masculino</th>
+                    <th>Total Femenino</th>
+                    <th>Total Inasistidos</th>
+                    <th>% Asistencia Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ totales.total_asistidos }}</td>
+                    <td>{{ totales.total_masculino }}</td>
+                    <td>{{ totales.total_femenino }}</td>
+                    <td>{{ totales.total_inasistidos }}</td>
+                    <td>{{ totales.porcentaje_asistencia }}%</td>
+                </tr>
+            </tbody>
+        </table>
+        {% endif %}
+
+
+
+
+
+    </div>
+
+</div>
+
+<h3 style="margin: 30px;">Porcentaje de asistencia</h3>
+
+<div class="chart-wrap horizontal" style="width: 90%;">
+    <div class="grid">
+        {% for asistencia in resumen %}
+        <div class="bar" style="--bar-value:{{ asistencia.porcentaje_asistencia }}%;" data-name="{{ asistencia.seccion }} - {{ asistencia.porcentaje_asistencia }}%">
+        </div>
+        {% endfor %}
+    </div>
+    <h3 style="margin: 30px;">Porcentaje de asistencia</h3>
+
+    <div class="grid">
+        {% for asistencia in resumen %}
+        <div class="bar" style="--bar-value:{{ asistencia.total_asistidos + asistencia.total_inasistidos }}%;" data-name=" Total de alumnos {{ asistencia.total_asistidos + asistencia.total_inasistidos }} de {{ asistencia.año }}{{ asistencia.seccion }}">
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
 
 {% endblock %}
