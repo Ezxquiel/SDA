@@ -1,6 +1,8 @@
-from flask import Blueprint, request, flash, redirect, url_for, render_template
+# routes.py
+from flask import Blueprint, request, flash, redirect, url_for, render_template, send_file
 from models.database import db_operation, get_db_connection
 from datetime import datetime, date
+from utils.pdf_generator import AttendanceReport
 
 admintarde_bp = Blueprint('admintarde', __name__)
 
@@ -20,17 +22,14 @@ def administracionPM():
 
         if request.method == 'POST':
             busqueda = request.form.get('busqueda', '').strip()
-            fecha_inicio = request.form.get('fecha_inicio', str(fecha_inicio))
-            fecha_fin = request.form.get('fecha_fin', str(fecha_fin))
+            fecha_inicio_str = request.form.get('fecha_inicio', str(fecha_inicio))
+            fecha_fin_str = request.form.get('fecha_fin', str(fecha_fin))
             mostrar_todo = request.form.get('mostrar_todo')
-
-            # Si se presiona el botón de mostrar todo, ignoramos la búsqueda
-            if mostrar_todo:
-                busqueda = ''
+            descargar_pdf = request.form.get('descargar_pdf')
 
             try:
-                fecha_inicio = datetime.strptime(fecha_inicio, '%Y-%m-%d').date()
-                fecha_fin = datetime.strptime(fecha_fin, '%Y-%m-%d').date()
+                fecha_inicio = datetime.strptime(fecha_inicio_str, '%Y-%m-%d').date()
+                fecha_fin = datetime.strptime(fecha_fin_str, '%Y-%m-%d').date()
 
                 if fecha_fin < fecha_inicio:
                     flash("La fecha final no puede ser menor que la fecha inicial.", "warning")
@@ -81,33 +80,46 @@ def administracionPM():
                         {0}
                     """.format("AND CONCAT(sec.año, sec.seccion) LIKE %s" if busqueda else "")
 
-                    # Preparar parámetros según si hay búsqueda o no
+                    # Preparar parámetros
                     params_detalle = [fecha_inicio, fecha_fin]
                     params_totales = [fecha_inicio, fecha_fin]
                     
                     if busqueda:
-                        busqueda_patron = f'%{busqueda}%'
-                        params_detalle.append(busqueda_patron)
-                        params_totales.append(busqueda_patron)
-                    
+                        params_detalle.append(f'%{busqueda}%')
+                        params_totales.append(f'%{busqueda}%')
+
                     # Ejecutar consultas
                     cursor.execute(consulta_detalle, tuple(params_detalle))
                     resumen = cursor.fetchall()
-
+                    
                     cursor.execute(consulta_totales, tuple(params_totales))
                     totales = cursor.fetchone()
+
+                    # Verificar si se debe generar PDF
+                    if descargar_pdf and resumen and totales:
+                        try:
+                            report = AttendanceReport(resumen, totales, fecha_inicio, fecha_fin)
+                            pdf_filename = report.generate()
+                            
+                            return send_file(
+                                pdf_filename,
+                                mimetype='application/pdf',
+                                as_attachment=True,
+                                download_name='reporte_asistencia.pdf'
+                            )
+                        except Exception as e:
+                            print(f"Error al generar PDF: {str(e)}")
+                            flash("Error al generar el PDF.", "danger")
 
             except Exception as e:
                 print(f"Error en la consulta: {str(e)}")
                 flash("Error al consultar la base de datos.", "danger")
-                return render_template('matutino.html', resumen=[], totales={}, busqueda=busqueda, 
-                                    fecha_inicio=fecha_inicio, fecha_fin=fecha_fin)
 
     except Exception as e:
         print(f"Error general: {str(e)}")
         flash("Ocurrió un error inesperado.", "danger")
         return render_template('vespertino.html', resumen=[], totales={}, busqueda='', 
-                             fecha_inicio='', fecha_fin='')
+                             fecha_inicio=fecha_inicio, fecha_fin=fecha_fin)
 
     finally:
         if conn:

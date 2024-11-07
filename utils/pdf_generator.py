@@ -1,102 +1,197 @@
-# utils/pdf_generator.py
 from fpdf import FPDF
 from datetime import datetime
+import os
 
-class AttendanceReport(FPDF):
-    def __init__(self):
-        super().__init__()
-        self.set_auto_page_break(auto=True, margin=15)
-        self.add_page()
-        self.set_font('Arial', 'B', 16)
+class Colors:
+    PRIMARY = (41, 128, 185)      # Azul principal
+    SECONDARY = (241, 196, 15)    # Amarillo
+    WHITE = (255, 255, 255)       # Blanco
+    LIGHT_BLUE = (214, 234, 248)  # Azul claro para alternar filas
+    HEADER_BLUE = (52, 152, 219)  # Azul para encabezados
+
+class AttendanceReport:
+    def __init__(self, resumen, totales, fecha_inicio, fecha_fin):
+        self.resumen = resumen
+        self.totales = totales
+        self.fecha_inicio = fecha_inicio
+        self.fecha_fin = fecha_fin
+        self.pdf = FPDF()
+        self.pdf.set_auto_page_break(auto=True, margin=15)
+        self.setup_pdf()
+
+    def setup_pdf(self):
+        self.pdf.add_page()
+        self.pdf.set_font('Arial', 'B', 16)
+            
+        try:
+            self.pdf.set_fill_color(240, 240, 240)
+            self.pdf.image('static/img/ardilla.png', 50, 100, 120)
+        except Exception as e:
+            print(f"No se pudo cargar la marca de agua: {str(e)}")
+
+    def add_header(self):
+        self.pdf.set_fill_color(*Colors.PRIMARY)
+        self.pdf.rect(0, 0, 210, 40, 'F')
+        self.pdf.image('static/img/logoInaSinFondo.png', x=3, y=3, w=40, h=40)
+        self.pdf.set_font('Arial', 'B', 24)
+        self.pdf.set_text_color(*Colors.WHITE)
+        self.pdf.cell(0, 25, 'Reporte de Asistencia ', 0, 1, 'C')
         
-    def header(self):
-        # Logo o imagen institucional (opcional)
-        # self.image('logo.png', 10, 8, 33)
-        self.set_font('Arial', 'B', 16)
-        self.cell(0, 10, 'Reporte de Asistencia - Turno Matutino', 0, 1, 'C')
-        self.ln(10)
+        self.pdf.set_font('Arial', '', 12)
+        self.pdf.set_text_color(*Colors.SECONDARY)
+        self.pdf.cell(0, 10, f'Período: {self.fecha_inicio} al {self.fecha_fin}', 0, 1, 'C')
+        self.pdf.ln(10)
+
+    def format_absence_codes(self, codes_str):
+        """Formatea los códigos de inasistencia de manera más legible"""
+        if not codes_str or codes_str == "[]":
+            return "-"
+        try:
+            codes = eval(codes_str)
+            code_count = {}
+            for code in codes:
+                code_count[code] = code_count.get(code, 0) + 1
+            return ", ".join([f"{code}({count})" for code, count in code_count.items()])
+        except:
+            return codes_str
+
+    def add_totales(self):
+        self.pdf.set_fill_color(*Colors.LIGHT_BLUE)
+        self.pdf.rect(10, self.pdf.get_y(), 190, 50, 'F')
         
-    def footer(self):
-        self.set_y(-15)
-        self.set_font('Arial', 'I', 8)
-        self.cell(0, 10, f'Página {self.page_no()}/{{nb}}', 0, 0, 'C')
+        self.pdf.set_font('Arial', 'B', 14)
+        self.pdf.set_text_color(*Colors.PRIMARY)
+        self.pdf.cell(0, 10, 'Resumen General', 0, 1)
         
-    def set_header_info(self, fecha_inicio, fecha_fin):
-        self.set_font('Arial', '', 12)
-        self.cell(0, 10, f'Período: {fecha_inicio} - {fecha_fin}', 0, 1, 'L')
-        self.ln(5)
+        self.pdf.set_font('Arial', '', 12)
+        self.pdf.set_text_color(0, 0, 0)
         
-    def add_table_header(self):
-        # Configurar encabezados de la tabla
-        self.set_font('Arial', 'B', 10)
-        self.set_fill_color(200, 200, 200)
+        if self.totales:
+            y_start = self.pdf.get_y()
+            col_width = 95
+                
+            self.pdf.set_xy(15, y_start)
+            self.pdf.cell(col_width, 8, f'Total Asistidos: {self.totales["total_asistidos"]}', 0)
+            self.pdf.set_xy(15, y_start + 8)
+            self.pdf.cell(col_width, 8, f'Total Masculino: {self.totales["total_masculino"]}', 0)
+            self.pdf.set_xy(15, y_start + 16)
+            self.pdf.cell(col_width, 8, f'Total Femenino: {self.totales["total_femenino"]}', 0)
+
+            self.pdf.set_xy(110, y_start)
+            self.pdf.cell(col_width, 8, f'Total Inasistidos: {self.totales["total_inasistidos"]}', 0)
+            self.pdf.set_xy(110, y_start + 8)
+
+            # Corregir el cálculo del total de alumnos
+            total_alumnos = self.totales["total_inasistidos"] + self.totales["total_asistidos"]
+            self.pdf.cell(col_width, 8, f'Total de Alumnos: {total_alumnos}', 0)
+
+            self.pdf.set_xy(110, y_start + 16)
+            self.pdf.cell(col_width, 8, f'% Asistencia: {self.totales["porcentaje_asistencia"]}%', 0)
+
+        # Actualizar el valor de y_start para la siguiente sección
+        self.pdf.ln(30)
+
+
+    def add_detail_table(self):
+        self.pdf.set_font('Arial', 'B', 14)
+        self.pdf.set_text_color(*Colors.PRIMARY)
+        self.pdf.cell(0, 10, 'Detalle por Sección', 0, 1)
         
-        # Definir anchos de columnas
-        col_widths = [15, 20, 25, 20, 20, 25, 35, 35]
-        headers = ['Año', 'Sección', 'Total\nAsistidos', 'Masculino', 'Femenino', 
-                  'Inasistidos', 'Códigos\nInasistidos', 'Códigos\nAsistidos']
+        # Eliminamos la columna de códigos de la tabla principal
+        headers = ['Año', 'Sección', 'Asist.', 'M', 'F', 'Inasist.', 'Total de alumnos','% Asist.']
+        col_widths = [20, 25, 25, 20, 20, 25, 25, 25]
+        
+        self.pdf.set_font('Arial', 'B', 10)
+        self.pdf.set_fill_color(*Colors.HEADER_BLUE)
+        self.pdf.set_text_color(*Colors.WHITE)
         
         for i, header in enumerate(headers):
-            self.cell(col_widths[i], 10, header, 1, 0, 'C', True)
-        self.ln()
+            self.pdf.cell(col_widths[i], 10, header, 1, 0, 'C', True)
+        self.pdf.ln()
         
-        return col_widths
+        self.pdf.set_font('Arial', '', 9)
+        self.pdf.set_text_color(0, 0, 0)
         
-    def add_row(self, data, col_widths):
-        self.set_font('Arial', '', 9)
-        
-        # Calcular altura máxima necesaria para la fila
-        max_height = 8
-        for i, content in enumerate(data):
-            if i >= 6:  # Para las columnas de códigos
-                needed_height = self.get_string_height(col_widths[i], str(content))
-                max_height = max(max_height, needed_height)
-        
-        # Imprimir cada celda con la altura calculada
-        for i, content in enumerate(data):
-            align = 'C' if i < 6 else 'L'  # Alineación centrada excepto para códigos
-            self.multi_cell(col_widths[i], max_height, str(content), 1, align, False) 
-            if i < len(data) - 1:  # Si no es la última celda
-                self.set_xy(self.get_x() + col_widths[i], self.get_y() - max_height)
-        
-        self.ln()
-        
-    def get_string_height(self, width, txt):
-        # Calcula la altura necesaria para el texto
-        lines = len(txt.split('\n'))
-        return max(8, lines * 4)  # Mínimo 8 pts, o más si hay múltiples líneas
-
-def generate_pdf(resumen, fecha_inicio, fecha_fin):
-    try:
-        pdf = AttendanceReport()
-        pdf.alias_nb_pages()
-        
-        # Configurar información del encabezado
-        pdf.set_header_info(
-            fecha_inicio.strftime('%d/%m/%Y'),
-            fecha_fin.strftime('%d/%m/%Y')
-        )
-        
-        # Agregar encabezados de la tabla
-        col_widths = pdf.add_table_header()
-        
-        # Agregar filas de datos
-        for row in resumen:
-            row_data = [
-                row[0],  # año
-                row[1],  # seccion
-                row[2],  # total_asistidos
-                row[3],  # masculino
-                row[4],  # femenino
-                row[5],  # inasistidos
-                row[6] if row[6] else 'Ninguno',  # codigos_inasistidos
-                row[7] if row[7] else 'Ninguno'   # codigos_asistidos
-            ]
-            pdf.add_row(row_data, col_widths)
+        for i, row in enumerate(self.resumen):
+            fill = Colors.LIGHT_BLUE if i % 2 == 0 else Colors.WHITE
+            self.pdf.set_fill_color(*fill)
             
-        # Generar PDF en memoria
-        return pdf.output(dest='S').encode('latin1')
+            self.pdf.cell(col_widths[0], 10, str(row['año']), 1, 0, 'C', True)
+            self.pdf.cell(col_widths[1], 10, str(row['seccion']), 1, 0, 'C', True)
+            self.pdf.cell(col_widths[2], 10, str(row['total_asistidos']), 1, 0, 'C', True)
+            self.pdf.cell(col_widths[3], 10, str(row['total_masculino']), 1, 0, 'C', True)
+            self.pdf.cell(col_widths[4], 10, str(row['total_femenino']), 1, 0, 'C', True)
+            self.pdf.cell(col_widths[5], 10, str(row['total_inasistidos']), 1, 0, 'C', True)
+            total = row['total_inasistidos'] + row['total_asistidos']
+            self.pdf.cell(col_widths[5], 10, str(total), 1, 0, 'C', True)
+            self.pdf.cell(col_widths[6], 10, f"{row['porcentaje_asistencia']}%", 1, 0, 'C', True)
+            self.pdf.ln()
+
+    def add_absence_codes_table(self):
+        # Agregar tabla de códigos en una nueva página
+        self.pdf.add_page()
         
-    except Exception as e:
-        print(f"Error generando PDF: {str(e)}")
-        raise
+        self.pdf.set_font('Arial', 'B', 14)
+        self.pdf.set_text_color(*Colors.PRIMARY)
+        self.pdf.cell(0, 10, 'Detalle de Códigos de Inasistencia', 0, 1)
+        self.pdf.ln(5)
+        
+        # Definir encabezados y anchos de columna
+        headers = ['Año', 'Sección', 'Inasistencias']
+        col_widths = [25, 35, 120]
+        
+        # Dibujar encabezados
+        self.pdf.set_font('Arial', 'B', 10)
+        self.pdf.set_fill_color(*Colors.HEADER_BLUE)
+        self.pdf.set_text_color(*Colors.WHITE)
+        
+        for i, header in enumerate(headers):
+            self.pdf.cell(col_widths[i], 10, header, 1, 0, 'C', True)
+        self.pdf.ln()
+        
+        # Dibujar contenido
+        self.pdf.set_font('Arial', '', 10)
+        self.pdf.set_text_color(0, 0, 0)
+        
+        for i, row in enumerate(self.resumen):
+            # Solo mostrar filas que tengan inasistencias
+            if row['codigos_inasistidos'] and row['codigos_inasistidos'] != "[]":
+                fill = Colors.LIGHT_BLUE if i % 2 == 0 else Colors.WHITE
+                self.pdf.set_fill_color(*fill)
+                
+                codigos = self.format_absence_codes(row['codigos_inasistidos'])
+                
+                # Si el contenido es muy largo, ajustar la altura de la celda
+                lines = len(codigos) // 60 + 1  # Aproximadamente 60 caracteres por línea
+                height = max(8, 6 * lines)
+                
+                self.pdf.cell(col_widths[0], height, str(row['año']), 1, 0, 'C', True)
+                self.pdf.cell(col_widths[1], height, str(row['seccion']), 1, 0, 'C', True)
+                
+                # Usar multicell para la columna de códigos si es necesario
+                x = self.pdf.get_x()
+                y = self.pdf.get_y()
+                self.pdf.multi_cell(col_widths[2], height, codigos, 1, 'C', True)
+                
+                # Si no estamos en la última fila, reposicionar el cursor
+                if i < len(self.resumen) - 1:
+                    self.pdf.set_xy(self.pdf.l_margin, y + height)
+        
+
+    def generate(self):
+        try:
+            self.add_header()
+            self.add_totales()
+            self.add_detail_table()
+            self.add_absence_codes_table()
+            
+            filename = f'reporte_asistencia_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
+            # Definir la ruta del archivo (por ejemplo, en el escritorio del usuario)
+            desktop_path = os.path.expanduser("~/Desktop")  # Esto obtiene la ruta del escritorio del usuario
+            filename = os.path.join(desktop_path, f'reporte_asistencia_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf')
+
+            # Guardar el archivo PDF en la ruta especificada
+            self.pdf.output(filename)
+            return filename
+        except Exception as e:
+            raise Exception(f"Error al generar el PDF: {str(e)}")
