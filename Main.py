@@ -18,11 +18,7 @@ app.secret_key = os.urandom(24) #llave random para que funcione ALV
 
 # Configuración de la base de datos
 DB_CONFIG = {
-    'host': "by8ekzvhusvvn2yqc71b-mysql.services.clever-cloud.com",
-    'user': "uueyyhu8xg3oenlv",
-    'password': "VFbwWo8TNmZQbg04Dd7i",
-    'database': "by8ekzvhusvvn2yqc71b",
-    'cursorclass': DictCursor
+    'database': 'backend\sqlite-tools-win-x64-3470000\Ina.db'  # Ruta y nombre del archivo de base de datos
 }
 
 def get_db_connection():
