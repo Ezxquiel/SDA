@@ -1,6 +1,13 @@
 {% extends 'layout.html' %}
 
 {% block content %}
+    <header>
+        <div class="menu-toggle" aria-expanded="false">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </header>
     <section class="Inicio-De-Web">
         <div class="titulos">
             <h1>INSTITUTO NACIONAL DE APOPA</h1>
@@ -10,4 +17,38 @@
             <img src="{{url_for('static', filename='img/LogoInaSinFondo.png')}}" alt="Logo De Ina">
         </div>
     </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const nav = document.querySelector('nav');
+    
+            if (menuToggle && nav) {
+                menuToggle.addEventListener('click', function () {
+                    menuToggle.classList.toggle('active');
+                    nav.classList.toggle('active');
+                    menuToggle.setAttribute('aria-expanded', menuToggle.classList.contains('active'));
+                });
+    
+                // Close menu on link click
+                const navLinks = nav.querySelectorAll('a');
+                navLinks.forEach(link => {
+                    link.addEventListener('click', () => {
+                        menuToggle.classList.remove('active');
+                        nav.classList.remove('active');
+                        menuToggle.setAttribute('aria-expanded', 'false');
+                    });
+                });
+    
+                // Close menu on outside click
+                document.addEventListener('click', function(event) {
+                    if (!nav.contains(event.target) && !menuToggle.contains(event.target)) {
+                        menuToggle.classList.remove('active');
+                        nav.classList.remove('active');
+                        menuToggle.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            }
+        });
+    </script>
 {% endblock %}

@@ -211,7 +211,7 @@
                     <td>{{ asistencia.total_femenino }}</td>
                     <td>{{ asistencia.total_inasistidos or 0 }}</td>
                     <td>{{ asistencia.total or (asistencia.total_asistidos + asistencia.total_inasistidos) }}</td>
-                    <td>{{ asistencia.codigos_inasistidos or 'N/A' }}</td>
+                    <td style="display: flex; overflow-x: scroll; width: 290px;">{{ asistencia.codigos_inasistidos or 'N/A' }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -229,6 +229,7 @@
             {% endfor %}
         </ul>
     </div>
+    
     
 
     <div class="records-section">

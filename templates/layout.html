@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,20 +19,44 @@
           <nav>
           <ul>
             <li><a href="">Inicio</a></li>
-            <li><a href="/padres">registro de padre</a></li>
+            <li><a href="/padres">Registro de padre</a></li>
             <li><a href="/estudiantes">Registro de alumno</a></li>
-            <li><a href="/secciones">Seccion</a></li>
-            <li><a href="/administracion">Administración</a></li>
-            <li><a href="/asistencia">Asistencia</a></li>
+            <li><a href="/secciones">Sección</a></li>
+            <li>
+              <a href="" class="main-menu">Administración</a> 
+              <ul class="submenu" style="display: none;"> 
+                <li><a href="/administracionAM">Turno Matutino</a></li>
+                <li><a href="/admintardePM">Turno Vespertino</a></li>
+              </ul>
+            </li>
+            <li><a href="/asistencia">Entrada</a></li>
             <li><a href="/salida">Salida</a></li>
-         </ul>
+          </ul>
         </nav>
         </div>
       </header>
       
+      <main style="width: 100%; height: 100vh;">
 
-    {% block content %}
-    
-    {% endblock %}
+      <script>
+            
+            const mainMenu = document.querySelector('.main-menu');
+            const submenu = document.querySelector('.submenu');
+
+            
+            mainMenu.addEventListener('click', function(event) {
+                event.preventDefault(); 
+                if (submenu.style.display === "none" || submenu.style.display === "") {
+                    submenu.style.display = "block"; 
+                } else {
+                    submenu.style.display = "none"; 
+                }
+            });
+      </script>
+
+      {% block content %}
+      {% endblock %}
+      
+  </main>
 </body>
 </html>
