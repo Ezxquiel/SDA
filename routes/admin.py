@@ -127,8 +127,6 @@ def administracion():
                         GROUP BY sec.año, sec.seccion
                     """
 
-
-
                     cursor.execute(consulta, (fecha_inicio, fecha_fin))
                     resumen = cursor.fetchall()
 

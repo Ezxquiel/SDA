@@ -1,10 +1,12 @@
 from flask import Blueprint, request, flash, redirect, url_for, render_template
 from models.database import db_operation
+from utils.auth_utils import login_requerido
 
 sections_bp = Blueprint('sections', __name__)
 
 @sections_bp.route('/secciones', methods=['GET', 'POST'])
 @db_operation
+@login_requerido
 def secciones_router(cursor):
     if request.method == 'POST':
         seccion = request.form['seccion']

@@ -3,10 +3,12 @@ from flask import Blueprint, request, flash, redirect, url_for, render_template,
 from models.database import db_operation, get_db_connection
 from datetime import datetime, date
 from utils.pdf_generator import AttendanceReport
+from utils.auth_utils import login_requerido
 
 admintarde_bp = Blueprint('admintarde', __name__)
 
 @admintarde_bp.route('/admintardePM', methods=['GET', 'POST'])
+@login_requerido
 def administracionPM():
     try:
         conn = get_db_connection()

@@ -1,11 +1,13 @@
 # routes/parents.py
 from flask import Blueprint, request, flash, redirect, url_for, render_template
 from models.database import db_operation
+from utils.auth_utils import login_requerido
 
 parents_bp = Blueprint('parents', __name__)
 
 @parents_bp.route('/padres', methods=['GET', 'POST'])
 @db_operation
+@login_requerido
 def padres_router(cursor):
     """
     Handle parent registration and display.
