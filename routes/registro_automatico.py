@@ -6,7 +6,7 @@ from datetime import datetime
 def llamar_registro_automatico():
     while True:
         ahora = datetime.now()
-        if ahora.hour == 00 and ahora.minute == 28:
+        if ahora.hour == 1 and ahora.minute == 53:
             try:
                 # Realiza la llamada HTTP al servidor Flask
                 response = requests.post("http://localhost:5000/registrar_entrada_automatica")
