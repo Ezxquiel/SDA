@@ -110,20 +110,20 @@ def administracion():
                     if not asistencias_hoy and not salidas_hoy and busqueda:
                         flash("No se encontraron registros para la búsqueda especificada.", "info")
 
+
+                #consulta para el resumen 
                     consulta = """
                         SELECT 
                             sec.año, 
                             sec.seccion, 
                             COUNT(e.nie) AS total_asistidos,
-                            COUNT(CASE WHEN est.genero = 'M' AND e.nie IS NOT NULL THEN 1 END) AS total_masculino,
-                            COUNT(CASE WHEN est.genero = 'F' AND e.nie IS NOT NULL THEN 1 END) AS total_femenino,
+                            COUNT(CASE WHEN est.genero = 'M' THEN 1 END) AS total_masculino,
+                            COUNT(CASE WHEN est.genero = 'F' THEN 1 END) AS total_femenino,
                             COUNT(CASE WHEN e.nie IS NULL THEN 1 END) AS total_inasistidos,
-                            GROUP_CONCAT(CASE WHEN e.nie IS NULL THEN est.codigo END) AS codigos_inasistidos,
-                            GROUP_CONCAT(CASE WHEN e.nie IS NOT NULL THEN est.codigo END) AS codigos_asistidos
+                            GROUP_CONCAT(CASE WHEN e.nie IS NULL THEN est.codigo END) AS codigos_inasistidos
                         FROM estudiantes est
                         LEFT JOIN entrada e ON est.nie = e.nie AND DATE(e.fecha) BETWEEN %s AND %s
                         JOIN seccion sec ON est.año = sec.año AND est.seccion = sec.seccion
-                        WHERE est.genero IN ('M', 'F')  -- Filtrar solo M y F
                         GROUP BY sec.año, sec.seccion
                     """
 
@@ -146,9 +146,8 @@ def administracion():
             #para descargar el pdf
             if descargar_pdf:
                 try:
-                    # Supongamos que asistencias_hoy y salidas_hoy son listas de diccionarios
                     report = AttendanceReport(asistencias_hoy, salidas_hoy)
-                    return report.generate()  # Llama al método para generar el PDF
+                    return report.generate()
                 except Exception as e:
                     print(f"Error al generar PDF: {str(e)}")
                     flash("Error al generar el PDF.", "danger")

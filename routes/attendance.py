@@ -1,6 +1,7 @@
 from flask import Blueprint, request, flash, redirect, url_for, render_template, jsonify
 from models.database import db_operation
 from datetime import datetime, time as dt_time
+from datetime import datetime
 
 attendance_bp = Blueprint('attendance', __name__)
 
@@ -11,7 +12,6 @@ def asistencia_router(cursor):
         nie_estudiante = request.form['nie']
 
         try:
-            # Verificar si el estudiante existe
             cursor.execute("SELECT * FROM estudiantes WHERE nie = %s", (nie_estudiante,))
             estudiante = cursor.fetchone()
 
@@ -26,6 +26,11 @@ def asistencia_router(cursor):
                         (nie_estudiante, fecha_actual, hora_actual)
                     )
                     flash('Asistencia registrada con éxito.', 'success')
+                cursor.execute(
+                    "INSERT INTO entrada (nie, fecha, hora) VALUES (%s, %s, %s)",
+                    (nie_estudiante, fecha_actual, hora_actual)
+                )
+                flash('Asistencia registrada con éxito.', 'success')
             else:
                 flash('El estudiante con ese NIE no existe.', 'danger')
 
@@ -82,14 +87,11 @@ def salida_router(cursor):
                 # Fecha y hora para registrar la salida
                 fecha_actual = datetime.now().date()
                 hora_actual = datetime.now().time()
-
-                # Registrar salida
                 cursor.execute(
                     "INSERT INTO salida (nie, fecha, hora) VALUES (%s, %s, %s)",
                     (nie_estudiante, fecha_actual, hora_actual)
                 )
                 flash('Salida registrada con éxito.', 'success')
-
             else:
                 flash('El estudiante con ese NIE no existe.', 'danger')
 
