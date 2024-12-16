@@ -9,16 +9,11 @@ from routes.sections import sections_bp
 from routes.admintarde import admintarde_bp
 from routes.admin_mañana import admin_mañana_bp
 from routes.registro_automatico import llamar_registro_automatico
+from routes.login import login_bp , inicio_bp
+from routes.inicio import index_bp
 import threading
 import os
-from dotenv import load_dotenv
 
-# Cargar las variables de entorno desde el archivo .env
-load_dotenv()
-
-# Datos de usuario y contraseña desde las variables de entorno
-USUARIO = os.getenv("USUARIO")
-CONTRASEÑA = os.getenv("CONTRASEÑA")
 
 # Crear la aplicación Flask
 app = Flask(__name__)
@@ -33,44 +28,12 @@ app.register_blueprint(parents_bp)
 app.register_blueprint(sections_bp)
 app.register_blueprint(admintarde_bp)
 app.register_blueprint(admin_mañana_bp)
-
-# Configurar la sesión
-app.config['SESSION_PERMANENT'] = False
-
-
-# Ruta principal
-@app.route('/')
-@app.route('/home')
-def home():
-    return render_template('index.html')
+app.register_blueprint(login_bp)
+app.register_blueprint(inicio_bp)
+app.register_blueprint(index_bp)
 
 
 
-# Función de cierre de sesión
-@app.route('/logout')
-def logout():
-    session.clear()
-    flash('Sesión cerrada exitosamente', 'success')
-    return redirect(url_for('login'))# Función de inicio de sesión
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        usuario = request.form['usuario']
-        contraseña = request.form['contraseña']
-        
-        # Verificar credenciales
-        if usuario == USUARIO and contraseña == CONTRASEÑA:
-            session['usuario'] = usuario
-            session['logged_in'] = True  # Estado de inicio de sesión
-            flash('Has iniciado sesión correctamente.', 'success')
-            # Redirigir al usuario a la página que intentaba acceder, si existe
-            next_url = request.args.get('next')
-            return redirect(next_url or url_for('home'))
-        else:
-            flash('Usuario o contraseña incorrectos', 'danger')
-            return redirect(url_for('login'))
-    
-    return render_template('login.html')
 
 # Función para iniciar el hilo de la tarea de registro automático
 def iniciar_registro_automatico():

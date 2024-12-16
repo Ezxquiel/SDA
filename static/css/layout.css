@@ -1,0 +1,79 @@
+/* layout.css */
+@import url('variables.css');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: var(--gray-light);
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* Responsive Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+}
+
+/* Main Page Layout */
+.Inicio-De-Web {
+    max-width: 1200px;
+    min-height: calc(100vh - 80px);
+    margin: 0 auto;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+}
+
+/* Admin Container */
+.admin-container {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .Inicio-De-Web {
+        flex-direction: column;
+        padding: 1rem;
+        min-height: auto;
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -20,7 +20,7 @@ def asistencia_router(cursor):
                 hora_actual = datetime.now().time()
 
                 # Comprobar si la entrada fue registrada entre las 6 y las 13:00
-                if dt_time(6, 0) <= hora_actual <= dt_time(13, 0):
+                if dt_time(6, 0) <= hora_actual <= dt_time(13, 12):
                     cursor.execute(
                         "INSERT INTO entrada (nie, fecha, hora) VALUES (%s, %s, %s)",
                         (nie_estudiante, fecha_actual, hora_actual)
@@ -48,20 +48,22 @@ def registrar_entrada_automatica(cursor):
     hora_automatica = dt_time(13, 16)
 
     try:
-        # Seleccionar estudiantes que no tienen salida registrada antes de las 13:15
+        # Seleccionar estudiantes que registraron entrada entre las 6:00 y las 12:00
+        # y que no tienen una salida registrada en el mismo día
         cursor.execute("""
             SELECT nie 
-            FROM estudiantes 
-            WHERE nie NOT IN (
+            FROM entrada 
+            WHERE fecha = %s AND hora BETWEEN %s AND %s
+            AND nie NOT IN (
                 SELECT nie 
                 FROM salida 
-                WHERE fecha = %s AND hora <= %s
+                WHERE fecha = %s
             )
-        """, (fecha_actual, dt_time(13, 15)))
+        """, (fecha_actual, dt_time(6, 0), dt_time(12, 00), fecha_actual))
         
         estudiantes_sin_salida = cursor.fetchall()
 
-        # Insertar entrada automática para cada estudiante sin salida
+        # Insertar entrada automática para cada estudiante que cumple las condiciones
         for estudiante in estudiantes_sin_salida:
             cursor.execute(
                 "INSERT INTO entrada (nie, fecha, hora) VALUES (%s, %s, %s)",
@@ -72,6 +74,8 @@ def registrar_entrada_automatica(cursor):
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
 
 @attendance_bp.route('/salida', methods=['GET', 'POST'])
 @db_operation

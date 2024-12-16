@@ -3,13 +3,17 @@ from flask import Blueprint, request, flash, redirect, url_for, render_template,
 from models.database import db_operation, get_db_connection
 from datetime import datetime, date
 from utils.pdf_generator import AttendanceReport
-from utils.auth_utils import login_requerido
+
 
 admin_mañana_bp = Blueprint('admin_mañana', __name__)
 
 @admin_mañana_bp.route('/administracionAM', methods=['GET', 'POST'])
-@login_requerido
+
 def administracionM():
+
+    if 'user_id' not in session:
+        flash("Debes iniciar sesión para acceder", "warning")
+        return redirect('/login')
     try:
         conn = get_db_connection()
         if not conn:

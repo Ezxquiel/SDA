@@ -7,6 +7,9 @@ students_bp = Blueprint('students', __name__)
 @students_bp.route('/estudiantes', methods=['GET', 'POST'])
 @db_operation
 def estudiantes_router(cursor):
+    if 'user_id' not in session:
+        flash("Debes iniciar sesión para acceder", "warning")
+        return redirect('/login')
     # Fetch form data
     cursor.execute("SELECT dui FROM padres")
     duis = [row['dui'] for row in cursor.fetchall()]

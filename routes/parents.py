@@ -1,14 +1,18 @@
 # routes/parents.py
 from flask import Blueprint, request, flash, redirect, url_for, render_template
 from models.database import db_operation
-from utils.auth_utils import login_requerido
+
 
 parents_bp = Blueprint('parents', __name__)
 
 @parents_bp.route('/padres', methods=['GET', 'POST'])
 @db_operation
-@login_requerido
+
+
 def padres_router(cursor):
+    if 'user_id' not in session:
+        flash("Debes iniciar sesión para acceder", "warning")
+        return redirect('/login')
     """
     Handle parent registration and display.
     Supports GET for displaying the form and POST for registering new parents.

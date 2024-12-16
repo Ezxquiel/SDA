@@ -6,7 +6,7 @@ sections_bp = Blueprint('sections', __name__)
 
 @sections_bp.route('/secciones', methods=['GET', 'POST'])
 @db_operation
-@login_requerido
+
 def secciones_router(cursor):
     if request.method == 'POST':
         seccion = request.form['seccion']

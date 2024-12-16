@@ -1,0 +1,28 @@
+/* variables.css */
+
+/* Color Variables */
+:root {
+    --primary-blue: #1a5f7a;
+    --secondary-blue: #457b9d;
+    --accent-yellow: #ffd700;
+    --light-yellow: #fff7d6;
+    --white: #ffffff;
+    --gray-light: #f8f9fa;
+    --gray: #6c757d;
+    --error-red: #dc3545;
+    --success-green: #28a745;
+  
+    /* Menu Variables */
+    --menu-bg: #1a5f7a;
+    --menu-hover: #457b9d;
+    --menu-active: #ffd700;
+    --menu-text: #ffffff;
+    --menu-height: 65px;
+  
+    /* Design System Variables */
+    --border-radius: 8px;
+    --transition: all 0.3s ease;
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+    --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+  }

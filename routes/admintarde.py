@@ -8,8 +8,11 @@ from utils.auth_utils import login_requerido
 admintarde_bp = Blueprint('admintarde', __name__)
 
 @admintarde_bp.route('/admintardePM', methods=['GET', 'POST'])
-@login_requerido
 def administracionPM():
+    if 'user_id' not in session:
+        flash("Debes iniciar sesión para acceder", "warning")
+        return redirect('/login')
+        
     try:
         conn = get_db_connection()
         if not conn:
