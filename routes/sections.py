@@ -1,6 +1,6 @@
-from flask import Blueprint, request, flash, redirect, url_for, render_template
+from flask import Blueprint, request, flash, redirect, url_for, render_template, session
 from models.database import db_operation
-from utils.auth_utils import login_requerido
+from utils.auth_utils import login_required
 
 sections_bp = Blueprint('sections', __name__)
 

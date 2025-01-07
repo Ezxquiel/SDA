@@ -26,4 +26,4 @@ def insertar_usuario(nombre:str, contraseña:str, rango:str):
         conn.close()
 
 # Crear usuario inicial
-insertar_usuario('juan', '123', 'vigilante')  # Cambia los valores según necesites
+insertar_usuario('juan2', '123', 'coordinador')  # Cambia los valores según necesites

@@ -2,55 +2,67 @@
 
 {% block content %}
 {% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    <ul class="flashes">
-      {% for category, message in messages %}
-        <li class="{{ category }}">{{ message }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
+    {% if messages %}
+        <ul class="flashes">
+            {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 {% endwith %}
 
-<div class="Formulario">
-  <form method="POST">
-      <label for="nombre">Nombre:</label>
-      <input type="text" name="nombre" required>
+<div class="Formulario card shadow-lg">
+    <div class="card-header">
+        <h2 class="card-title text-center">Registro de Estudiante</h2>
+    </div>
+    
+    <form method="POST" action="/estudiantes" class="card-body">
+        <div class="form-group">
+            <label for="nombre" class="form-label">Nombre:</label>
+            <input type="text" name="nombre" class="form-control" required>
+        </div>
 
-      <label for="nie">NIE:</label>
-      <input type="text" name="nie" required>
+        <div class="form-group">
+            <label for="nie" class="form-label">NIE:</label>
+            <input type="text" name="nie" class="form-control" required>
+        </div>
 
-      <label for="edad">Edad:</label>
-      <input type="number" name="edad" required>
+        <div class="form-group">
+            <label for="edad" class="form-label">Edad:</label>
+            <input type="number" name="edad" class="form-control" required>
+        </div>
 
-      <label for="año">Año:</label>
-      <select name="año" required>
-          {% for año in anios %}
-          <option value="{{ año }}">{{ año }}</option>
-          {% endfor %}
-      </select>
+        <div class="form-group">
+            <label for="año" class="form-label">Año:</label>
+            <select name="año" class="form-control" required>
+                {% for año in anios %}
+                <option value="{{ año }}">{{ año }}</option>
+                {% endfor %}
+            </select>
+        </div>
 
-      <label for="codigo">Código:</label>
-      <input type="text" name="codigo" required>
+        <div class="form-group">
+            <label for="codigo" class="form-label">Código:</label>
+            <input type="text" name="codigo" class="form-control" required>
+        </div>
 
-      <label for="dui">DUI del Padre:</label>
-      <select name="dui" required>
-          {% for dui in duis %}
-          <option value="{{ dui }}">{{ dui }}</option>
-          {% endfor %}
-      </select>
+        <div class="form-group">
+            <label for="seccion" class="form-label">Sección:</label>
+            <select name="seccion" class="form-control" required>
+                {% for seccion in secciones %}
+                <option value="{{ seccion }}">{{ seccion }}</option>
+                {% endfor %}
+            </select>
+        </div>
 
-      <label for="seccion">Sección:</label>
-      <select name="seccion" required>
-          {% for seccion in secciones %}
-          <option value="{{ seccion }}">{{ seccion }}</option>
-          {% endfor %}
-      </select>
+        <div class="form-group">
+            <label for="genero" class="form-label">Género:</label>
+            <input type="text" name="genero" id="genero" class="form-control">
+        </div>
 
-      <label for="genero">Genero:</label>
-      <input type="text" name="genero" id="genero">
-
-      <button type="submit">Registrar Estudiante</button>
-  </form>
+        <div class="card-footer text-center">
+            <button type="submit" class="btn btn-primary hover-lift">Registrar Estudiante</button>
+        </div>
+    </form>
 </div>
-
 {% endblock %}

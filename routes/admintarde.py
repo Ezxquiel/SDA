@@ -1,9 +1,9 @@
 # routes.py
-from flask import Blueprint, request, flash, redirect, url_for, render_template, send_file
+from flask import Blueprint, request, flash, redirect, url_for, render_template, send_file, session
 from models.database import db_operation, get_db_connection
 from datetime import datetime, date
 from utils.pdf_generator import AttendanceReport
-from utils.auth_utils import login_requerido
+from utils.auth_utils import login_required, admin_required
 
 admintarde_bp = Blueprint('admintarde', __name__)
 

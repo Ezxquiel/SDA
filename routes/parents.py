@@ -1,5 +1,5 @@
 # routes/parents.py
-from flask import Blueprint, request, flash, redirect, url_for, render_template
+from flask import Blueprint, request, flash, redirect, url_for, render_template, session
 from models.database import db_operation
 
 
@@ -7,8 +7,6 @@ parents_bp = Blueprint('parents', __name__)
 
 @parents_bp.route('/padres', methods=['GET', 'POST'])
 @db_operation
-
-
 def padres_router(cursor):
     if 'user_id' not in session:
         flash("Debes iniciar sesión para acceder", "warning")

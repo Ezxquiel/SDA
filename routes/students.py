@@ -1,6 +1,6 @@
-from flask import Blueprint, request, flash, redirect, url_for, render_template
+from flask import Blueprint, request, flash, redirect, url_for, render_template, session
 from models.database import db_operation
-from utils.auth_utils import login_requerido
+from utils.auth_utils import login_required
 
 students_bp = Blueprint('students', __name__)
 
@@ -11,8 +11,7 @@ def estudiantes_router(cursor):
         flash("Debes iniciar sesión para acceder", "warning")
         return redirect('/login')
     # Fetch form data
-    cursor.execute("SELECT dui FROM padres")
-    duis = [row['dui'] for row in cursor.fetchall()]
+
 
     cursor.execute("SELECT seccion FROM seccion")
     secciones = [row['seccion'] for row in cursor.fetchall()]
@@ -27,16 +26,10 @@ def estudiantes_router(cursor):
             edad = request.form['edad']
             año = request.form['año']
             codigo = request.form['codigo']
-            dui = request.form['dui']
+
             seccion = request.form['seccion']
             genero = request.form['genero']
 
-            # Verify parent exists
-            cursor.execute("SELECT * FROM padres WHERE dui = %s", (dui,))
-            padre = cursor.fetchone()
-            if not padre:
-                flash('El DUI del padre no está registrado.', 'danger')
-                return redirect(url_for('students.estudiantes_router'))
             
             # Verify section exists
             cursor.execute("SELECT * FROM seccion WHERE seccion = %s AND año = %s", 
@@ -49,9 +42,9 @@ def estudiantes_router(cursor):
             # Insert student
             cursor.execute("""
                 INSERT INTO estudiantes 
-                (nombre, nie, edad, año, codigo, dui, seccion, genero) 
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-            """, (nombre, nie, edad, año, codigo, dui, seccion, genero))
+                (nombre, nie, edad, año, codigo, seccion, genero) 
+                VALUES (%s, %s, %s, %s, %s, %s,  %s)
+            """, (nombre, nie, edad, año, codigo, seccion, genero))
             
             flash('Alumno registrado con éxito.', 'success')
             
@@ -65,4 +58,4 @@ def estudiantes_router(cursor):
             
         return redirect(url_for('students.estudiantes_router'))
 
-    return render_template('estudiantes.html', duis=duis, secciones=secciones, anios=anios)
+    return render_template('estudiantes.html',  secciones=secciones, anios=anios)

@@ -1,12 +1,12 @@
-{% extends 'layout.html' %}
-
+{% extends "layout.html" %}
 {% block content %}
+
 
 
 <div class="admin-container">
     <h1 class="page-title">Administración Vespertina</h1>
 
-    <form class="search-form" method="POST" action="/admintardePM" >
+    <form class="search-form" method="POST" action="/admintardePM">
         <input type="text" name="busqueda" placeholder="Buscar Por Sección...." autocomplete="off" autofocus>
         <input type="date" name="fecha_inicio" placeholder="Fecha Inicio">
         <input type="date" name="fecha_fin" placeholder="Fecha fin">
@@ -92,7 +92,8 @@
 <div class="chart-wrap horizontal" style="width: 90%;">
     <div class="grid">
         {% for asistencia in resumen %}
-        <div class="bar" style="--bar-value:{{ asistencia.porcentaje_asistencia }}%;" data-name="{{ asistencia.seccion }} - {{ asistencia.porcentaje_asistencia }}%">
+        <div class="bar" style="--bar-value:{{ asistencia.porcentaje_asistencia }}%;"
+            data-name="{{ asistencia.seccion }} - {{ asistencia.porcentaje_asistencia }}%">
         </div>
         {% endfor %}
     </div>
@@ -100,7 +101,8 @@
 
     <div class="grid">
         {% for asistencia in resumen %}
-        <div class="bar" style="--bar-value:{{ asistencia.total_asistidos + asistencia.total_inasistidos }}%;" data-name=" Total de alumnos {{ asistencia.total_asistidos + asistencia.total_inasistidos }} de {{ asistencia.año }}{{ asistencia.seccion }}">
+        <div class="bar" style="--bar-value:{{ asistencia.total_asistidos + asistencia.total_inasistidos }}%;"
+            data-name=" Total de alumnos {{ asistencia.total_asistidos + asistencia.total_inasistidos }} de {{ asistencia.año }}{{ asistencia.seccion }}">
         </div>
         {% endfor %}
     </div>

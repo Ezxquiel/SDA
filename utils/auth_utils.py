@@ -1,13 +1,22 @@
-# auth_utils.py
 from functools import wraps
-from flask import session, flash, redirect, url_for, request
+from flask import session, redirect, url_for, flash
 
-def login_requerido(f):
+def admin_required(f):
     @wraps(f)
-    def decorador(*args, **kwargs):
-        if not session.get('logged_in'):
-            flash('Debes iniciar sesión para acceder a esta página.', 'warning')
-            # Guardar la URL actual a la que el usuario intentaba acceder
-            return redirect(url_for('login', next=request.path))
+    def decorated_function(*args, **kwargs):
+        if session.get('user_rango') != 'coordinador':
+            flash("No tienes permiso para acceder a esta página.", "danger")
+            return redirect(url_for('login.inicio'))
         return f(*args, **kwargs)
-    return decorador
+    return decorated_function
+
+
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            flash("Por favor, inicia sesión primero.", "warning")
+            return redirect(url_for('login.inicio'))
+        return f(*args, **kwargs)
+    return decorated_function

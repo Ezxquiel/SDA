@@ -55,7 +55,7 @@ def inicio():
             else:
                 flash("Contraseña incorrecta", "danger")
         else:
-            flash("Usuario no encontrado o deshabilitado", "danger")
+            flash("usuario o contraseña incorrectas ", "danger")
 
     return render_template('login.html', titulo=titulo)
 

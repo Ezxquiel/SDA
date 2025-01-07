@@ -1,79 +1,194 @@
-/* layout.css */
-@import url('variables.css');
-
+/* Base */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
+    font-family: system-ui, sans-serif;
     background: var(--gray-light);
 }
 
-html {
-    scroll-behavior: smooth;
+/* Header */
+.hd {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: var(--primary-blue);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    z-index: 100;
 }
 
-/* Responsive Container */
-.container {
+.wrap {
     max-width: 1200px;
     margin: 0 auto;
-    height: 100%;
+    padding: 0 20px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 0 2rem;
+    height: 65px;
 }
 
-/* Main Page Layout */
-.Inicio-De-Web {
-    max-width: 1200px;
-    min-height: calc(100vh - 80px);
-    margin: 0 auto;
-    padding: 2rem;
+.logo img {
+    height: 50px;
+    width: auto;
+}
+
+/* Nav */
+.nav ul {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 2rem;
+    list-style: none;
+    gap: 20px;
 }
 
-/* Admin Container */
-.admin-container {
-    max-width: 1400px;
-    margin: 2rem auto;
-    padding: 0 1.5rem;
+.nav a {
+    color: var(--white);
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: 0.3s;
 }
 
-/* Responsive Adjustments */
+.nav a:hover {
+    background: var(--accent-yellow);
+    color: var(--secondary-blue);
+}
+
+/* Dropdown */
+.drop {
+    position: relative;
+}
+
+.sub {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: var(--white);
+    min-width: 200px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border-radius: 4px;
+}
+
+.sub.show {
+    display: block;
+}
+
+.sub a {
+    display: block;
+    padding: 10px 15px;
+}
+
+/* Main */
+.main {
+    margin-top: 65px;
+    padding: 20px;
+    min-height: calc(100vh - 65px);
+}
+
+/* Menu móvil */
+.menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--primary-blue);
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-    .Inicio-De-Web {
+    .menu-btn {
+        display: block;
+        margin-left: auto;
+    }
+
+    .nav {
+        display: none;
+        position: absolute;
+        top: 65px;
+        left: 0;
+        right: 0;
+        background: var(--white);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .nav.show {
+        display: block;
+    }
+
+    .nav ul {
         flex-direction: column;
-        padding: 1rem;
-        min-height: auto;
+        padding: 20px;
+        gap: 10px;
+    }
+
+    .nav a {
+        display: block;
+        padding: 12px;
+    }
+
+    .sub {
+        position: static;
+        box-shadow: none;
+        background: var(--light-yellow);
+        margin: 5px 0;
+    }
+
+    .sub a {
+        padding-left: 24px;
     }
 }
 
-/* Animations */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+        /* Estilos para el menú móvil */
+        .menu-btn {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+            position: relative;
+            z-index: 1000; /* Asegura que el botón esté encima de todo */
+            color: #000000; /* Color de la letra del botón */
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .nav {
+            display: flex;
+            background-color:var(--primary-blue) ;
+        }
+        .nav ul {
+            display: flex;
+            list-style: none;
+            padding: 0;
+        }
+        .nav ul li {
+            margin: 0 10px;
+        }
+        .nav ul li a {
+            text-decoration: none;
+        }
+        .nav ul .sub {
+            display: none;
+        }
+        .nav ul .sub.show {
+            display: block;
+            background-color: var(--primary-blue);
+        }
+        @media (max-width: 768px) {
+            .menu-btn {
+                display: block;
+            }
+            .nav {
+                display: none;
+                flex-direction: column;
+            }
+            .nav.show {
+                display: flex;
+            }
+            .nav ul {
+                flex-direction: column;
+            }
+            .nav ul li {
+                margin: 10px 0;
+            }
+        }

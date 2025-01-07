@@ -4,66 +4,68 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="{{url_for('static', filename='img/LogoInaSinFondo.png')}}" type="image/x-icon">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css')}}">
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/asistencia.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/estudiantes.css')}}">
+    
     <title>{{ web_name }} - Instituto Nacional De Apopa INA</title>
+ 
 </head>
 <body>
-
-  
-
-    <header>
-        <div class="container">
-          <div class="logo-box">
-            <a href="/">
-              <img src="{{url_for('static', filename='img/LogoInaSinFondo.png')}}" alt="Logo del Ina">
-            </a>
-          </div>
-          <nav>
-          <ul>
-            <li><a href="">Inicio</a></li>
-            
-            {% if session.get('user_rango') == 'cordinador' %}
-            <li><a href="/padres">Registro de padre</a></li>
-            <li><a href="/estudiantes">Registro de alumno</a></li>
-            <li><a href="/secciones">Sección</a></li>
-            <li>
-              <a href="" class="main-menu">Administración</a> 
-              <ul class="submenu" style="display: none;"> 
-                <li><a href="/administracionAM">Turno Matutino</a></li>
-                <li><a href="/admintardePM">Turno Vespertino</a></li>
-              {% endif %}
-                
-              </ul>
-            </li>
-            <li><a href="/asistencia">Entrada</a></li>
-            <li><a href="/salida">Salida</a></li>
-          </ul>
-        </nav>
+    <header class="hd">
+        <div class="wrap">
+            <div class="logo">
+                <a href="">
+                    <img src="{{url_for('static', filename='img/LogoInaSinFondo.png')}}" alt="Logo del Ina">
+                </a>
+            </div>
+            <button class="menu-btn">☰</button>
+            <nav class="nav">
+                <ul>
+                    <li><a href="/index">Inicio</a></li>
+                    
+                    {% if session.get('user_rango') == 'coordinador' %}
+                    <li><a href="/padres">Registro de padre</a></li>
+                    <li><a href="/estudiantes">Registro de alumno</a></li>
+                    <li><a href="/secciones">Sección</a></li>
+                    <li class="drop">
+                        <a href="" class="main-menu">Administración</a>
+                        <ul class="sub">
+                            <li><a href="/administracionAM">Turno Matutino</a></li>
+                            <li><a href="/admintardePM">Turno Vespertino</a></li>
+                        </ul>
+                    {% endif %}
+                    </li>
+                    <li><a href="/asistencia">Entrada</a></li>
+                    <li><a href="/salida">Salida</a></li>
+                </ul>
+            </nav>
         </div>
-      </header>
-      
-      <main style="width: 100%; height: 100vh;">
+    </header>
 
-      <script>
-            
-            const mainMenu = document.querySelector('.main-menu');
-            const submenu = document.querySelector('.submenu');
+    <main class="main">
+        {% block content %}
+        {% endblock %}
+    </main>
 
-            
-            mainMenu.addEventListener('click', function(event) {
-                event.preventDefault(); 
-                if (submenu.style.display === "none" || submenu.style.display === "") {
-                    submenu.style.display = "block"; 
-                } else {
-                    submenu.style.display = "none"; 
-                }
-            });
-      </script>
+    <script>
+        // Toggle menú móvil
+        const menuBtn = document.querySelector('.menu-btn');
+        const nav = document.querySelector('.nav');
+        menuBtn.addEventListener('click', () => {
+            nav.classList.toggle('show');
+        });
 
-      {% block content %}
-      {% endblock %}
-      
-  </main>
+        // Toggle submenú
+        const mainMenu = document.querySelector('.main-menu');
+        const sub = document.querySelector('.sub');
+        mainMenu.addEventListener('click', (e) => {
+            e.preventDefault();
+            sub.classList.toggle('show');
+        });
+    </script>
 </body>
 </html>

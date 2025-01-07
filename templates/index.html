@@ -1,23 +1,20 @@
-
 {% extends 'layout.html' %}
 
 {% block content %}
-    <header>
-        <div class="menu-toggle" aria-expanded="false">
-            <span></span>
-            <span></span>
-            <span></span>
+
+        <div class="ina-content-wrapper">
+            <div class="ina-card">
+                <div class="ina-logo-container">
+                    <img src="{{url_for('static', filename='img/LogoInaSinFondo.png')}}" alt="Logo De Ina">
+                </div>
+                <div class="ina-titulos">
+                    <h1>INSTITUTO NACIONAL DE APOPA</h1>
+                    <div class="ina-divider"></div>
+                    <p>Hacia el Desarrollo y el Progreso, a través de la Educación</p>
+                </div>
+            </div>
         </div>
-    </header>
-    <section class="Inicio-De-Web">
-        <div class="titulos">
-            <h1>INSTITUTO NACIONAL DE APOPA</h1>
-            <p>Hacia el Desarrollo y el Progreso, a través de la Educación</p>
-        </div>
-        <div class="logodelina">
-            <img src="{{url_for('static', filename='img/LogoInaSinFondo.png')}}" alt="Logo De Ina">
-        </div>
-    </section>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {

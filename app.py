@@ -32,9 +32,6 @@ app.register_blueprint(login_bp)
 app.register_blueprint(inicio_bp)
 app.register_blueprint(index_bp)
 
-
-
-
 # Función para iniciar el hilo de la tarea de registro automático
 def iniciar_registro_automatico():
     threading.Thread(target=llamar_registro_automatico, daemon=True).start()
@@ -42,4 +39,4 @@ def iniciar_registro_automatico():
 # Ejecutar el hilo después de que Flask inicie la aplicación
 if __name__ == '__main__':
     iniciar_registro_automatico()
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)

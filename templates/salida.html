@@ -1,16 +1,18 @@
+
 {% extends 'layout.html' %}
-
 {% block content %}
-
-<form id="FormularioForm" class="Formulario" action="/salida" method="POST">
-    <label for="nie">NIE</label>
-    <input type="text" id="nie" name="nie" autofocus required>
-    
-    <button type="submit">Registrar</button>
-</form>
+<div class="form-container">
+    <h1 class="form-title">Registro de Salida </h1>
+    <form id="FormularioForm" class="Formulario" action="/salida" method="POST">
+        <div class="form-group">
+            <label for="nie" class="form-label">NIE</label>
+            <input type="text" id="nie" name="nie" class="form-input" autofocus required>
+        </div>
+        <button type="submit" class="form-button">Registrar</button>
+    </form>
+</div>
 
 <script>
-    // Función para detectar si es dispositivo móvil
     function isMobileDevice() {
         return window.matchMedia("(max-width: 768px)").matches;
     }
@@ -18,8 +20,7 @@
     let typingTimer;
     const doneTypingInterval = 250;
     const input = document.getElementById('nie');
-    
-    // Solo agregamos los event listeners si NO es un dispositivo móvil
+
     if (!isMobileDevice()) {
         input.addEventListener('keyup', () => {
             clearTimeout(typingTimer);
@@ -27,20 +28,19 @@
                 document.getElementById('FormularioForm').submit();
             }, doneTypingInterval);
         });
-        
+
         input.addEventListener('keydown', () => {
             clearTimeout(typingTimer);
         });
     }
 
-    // Agregar listener para cambios en el tamaño de la ventana
     window.addEventListener('resize', () => {
         if (isMobileDevice()) {
-            // Remover los event listeners en dispositivos móviles
             input.removeEventListener('keyup', null);
             input.removeEventListener('keydown', null);
         }
     });
 </script>
-
 {% endblock %}
+
+</html>

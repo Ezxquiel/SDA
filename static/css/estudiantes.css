@@ -1,0 +1,208 @@
+/* Base styles and resets */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Flash messages styling */
+.flashes {
+    list-style: none;
+    width: 100%;
+    max-width: 600px;
+    margin: 1rem auto;
+    padding: 0;
+}
+
+.flashes li {
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 8px;
+    text-align: center;
+    background-color: var(--primary-blue);
+    color: var(--white);
+    border: 2px solid var(--accent-yellow);
+}
+
+/* Form container styling */
+.Formulario {
+    width: 100%;
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--primary-blue);
+}
+
+/* Form title */
+.form-title {
+    color: var(--primary-blue);
+    text-align: center;
+    font-size: 1.75rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--accent-yellow);
+}
+
+/* Form group styling */
+.form-group {
+    margin-bottom: 1.5rem;
+    background-color: var(--white);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--secondary-blue);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group:hover {
+    border-color: var(--accent-yellow);
+    box-shadow: 0 2px 8px rgba(26, 95, 122, 0.1);
+}
+
+/* Label styling */
+label {
+    color: var(--primary-blue);
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+/* Input and select styling */
+input, select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid var(--secondary-blue);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    background-color: var(--white);
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--accent-yellow);
+    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+}
+
+input:hover, select:hover {
+    border-color: var(--accent-yellow);
+}
+
+/* Required field styling */
+input:required, select:required {
+    border-left: 4px solid var(--accent-yellow);
+}
+
+/* Button styling */
+button {
+    width: 100%;
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    color: var(--white);
+    padding: 1rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-top: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+button::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, transparent, rgba(255, 215, 0, 0.2));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(26, 95, 122, 0.2);
+}
+
+button:hover::after {
+    opacity: 1;
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* Validation states */
+.is-valid {
+    border-color: var(--success-green);
+}
+
+.is-invalid {
+    border-color: var(--error-red);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .Formulario {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+    
+    .form-group {
+        padding: 0.75rem;
+    }
+    
+    input, select, button {
+        padding: 0.875rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .Formulario {
+        margin: 0.5rem;
+        padding: 1rem;
+    }
+    
+    .form-group {
+        padding: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    label {
+        font-size: 0.9rem;
+    }
+    
+    input, select, button {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    .form-title {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+}
+
+/* Animation keyframes for form load */
+@keyframes formFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.Formulario {
+    animation: formFadeIn 0.5s ease-out forwards;
+}

@@ -3,11 +3,12 @@ from datetime import datetime
 import os
 
 class Colors:
-    PRIMARY = (41, 128, 185)      # Azul principal
-    SECONDARY = (241, 196, 15)    # Amarillo
-    WHITE = (255, 255, 255)       # Blanco
-    LIGHT_BLUE = (214, 234, 248)  # Azul claro para alternar filas
-    HEADER_BLUE = (52, 152, 219)  # Azul para encabezados
+    PRIMARY = (41, 128, 185)
+    SECONDARY = (241, 196, 15)
+    WHITE = (255, 255, 255)
+    LIGHT_BLUE = (214, 234, 248)
+    HEADER_BLUE = (52, 152, 219)
+    DARK_GRAY = (50, 50, 50)
 
 class AttendanceReport:
     def __init__(self, resumen, totales, fecha_inicio, fecha_fin):
@@ -22,7 +23,9 @@ class AttendanceReport:
     def setup_pdf(self):
         self.pdf.add_page()
         self.pdf.set_font('Arial', 'B', 16)
-            
+        self.add_watermark()
+
+    def add_watermark(self):
         try:
             self.pdf.set_fill_color(240, 240, 240)
             self.pdf.image('static/img/ardilla.png', 50, 100, 120)
@@ -43,7 +46,6 @@ class AttendanceReport:
         self.pdf.ln(10)
 
     def format_absence_codes(self, codes_str):
-        """Formatea los códigos de inasistencia de manera más legible"""
         if not codes_str or codes_str == "[]":
             return "-"
         try:
@@ -64,7 +66,7 @@ class AttendanceReport:
         self.pdf.cell(0, 10, 'Resumen General', 0, 1)
         
         self.pdf.set_font('Arial', '', 12)
-        self.pdf.set_text_color(0, 0, 0)
+        self.pdf.set_text_color(*Colors.DARK_GRAY)
         
         if self.totales:
             y_start = self.pdf.get_y()
@@ -81,24 +83,20 @@ class AttendanceReport:
             self.pdf.cell(col_width, 8, f'Total Inasistidos: {self.totales["total_inasistidos"]}', 0)
             self.pdf.set_xy(110, y_start + 8)
 
-            # Corregir el cálculo del total de alumnos
             total_alumnos = self.totales["total_inasistidos"] + self.totales["total_asistidos"]
             self.pdf.cell(col_width, 8, f'Total de Alumnos: {total_alumnos}', 0)
 
             self.pdf.set_xy(110, y_start + 16)
             self.pdf.cell(col_width, 8, f'% Asistencia: {self.totales["porcentaje_asistencia"]}%', 0)
 
-        # Actualizar el valor de y_start para la siguiente sección
         self.pdf.ln(30)
-
 
     def add_detail_table(self):
         self.pdf.set_font('Arial', 'B', 14)
         self.pdf.set_text_color(*Colors.PRIMARY)
         self.pdf.cell(0, 10, 'Detalle por Sección', 0, 1)
         
-        # Eliminamos la columna de códigos de la tabla principal
-        headers = ['Año', 'Sección', 'Asist.', 'M', 'F', 'Inasist.', 'Total de alumnos','% Asist.']
+        headers = ['Año', 'Sección', 'Asist.', 'M', 'F', 'Inasist.', 'Total de alumnos', '% Asist.']
         col_widths = [20, 25, 25, 20, 20, 25, 25, 25]
         
         self.pdf.set_font('Arial', 'B', 10)
@@ -110,7 +108,7 @@ class AttendanceReport:
         self.pdf.ln()
         
         self.pdf.set_font('Arial', '', 9)
-        self.pdf.set_text_color(0, 0, 0)
+        self.pdf.set_text_color(*Colors.DARK_GRAY)
         
         for i, row in enumerate(self.resumen):
             fill = Colors.LIGHT_BLUE if i % 2 == 0 else Colors.WHITE
@@ -123,12 +121,11 @@ class AttendanceReport:
             self.pdf.cell(col_widths[4], 10, str(row['total_femenino']), 1, 0, 'C', True)
             self.pdf.cell(col_widths[5], 10, str(row['total_inasistidos']), 1, 0, 'C', True)
             total = row['total_inasistidos'] + row['total_asistidos']
-            self.pdf.cell(col_widths[5], 10, str(total), 1, 0, 'C', True)
-            self.pdf.cell(col_widths[6], 10, f"{row['porcentaje_asistencia']}%", 1, 0, 'C', True)
+            self.pdf.cell(col_widths[6], 10, str(total), 1, 0, 'C', True)
+            self.pdf.cell(col_widths[7], 10, f"{row['porcentaje_asistencia']}%", 1, 0, 'C', True)
             self.pdf.ln()
 
     def add_absence_codes_table(self):
-        # Agregar tabla de códigos en una nueva página
         self.pdf.add_page()
         
         self.pdf.set_font('Arial', 'B', 14)
@@ -136,11 +133,9 @@ class AttendanceReport:
         self.pdf.cell(0, 10, 'Detalle de Códigos de Inasistencia', 0, 1)
         self.pdf.ln(5)
         
-        # Definir encabezados y anchos de columna
         headers = ['Año', 'Sección', 'Inasistencias']
         col_widths = [25, 35, 120]
         
-        # Dibujar encabezados
         self.pdf.set_font('Arial', 'B', 10)
         self.pdf.set_fill_color(*Colors.HEADER_BLUE)
         self.pdf.set_text_color(*Colors.WHITE)
@@ -149,34 +144,28 @@ class AttendanceReport:
             self.pdf.cell(col_widths[i], 10, header, 1, 0, 'C', True)
         self.pdf.ln()
         
-        # Dibujar contenido
         self.pdf.set_font('Arial', '', 10)
-        self.pdf.set_text_color(0, 0, 0)
+        self.pdf.set_text_color(*Colors.DARK_GRAY)
         
         for i, row in enumerate(self.resumen):
-            # Solo mostrar filas que tengan inasistencias
             if row['codigos_inasistidos'] and row['codigos_inasistidos'] != "[]":
                 fill = Colors.LIGHT_BLUE if i % 2 == 0 else Colors.WHITE
                 self.pdf.set_fill_color(*fill)
                 
                 codigos = self.format_absence_codes(row['codigos_inasistidos'])
                 
-                # Si el contenido es muy largo, ajustar la altura de la celda
-                lines = len(codigos) // 60 + 1  # Aproximadamente 60 caracteres por línea
+                lines = len(codigos) // 60 + 1
                 height = max(8, 6 * lines)
                 
                 self.pdf.cell(col_widths[0], height, str(row['año']), 1, 0, 'C', True)
                 self.pdf.cell(col_widths[1], height, str(row['seccion']), 1, 0, 'C', True)
                 
-                # Usar multicell para la columna de códigos si es necesario
                 x = self.pdf.get_x()
                 y = self.pdf.get_y()
                 self.pdf.multi_cell(col_widths[2], height, codigos, 1, 'C', True)
                 
-                # Si no estamos en la última fila, reposicionar el cursor
                 if i < len(self.resumen) - 1:
                     self.pdf.set_xy(self.pdf.l_margin, y + height)
-        
 
     def generate(self):
         try:
@@ -185,12 +174,8 @@ class AttendanceReport:
             self.add_detail_table()
             self.add_absence_codes_table()
             
-            filename = f'reporte_asistencia_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
-            # Definir la ruta del archivo (por ejemplo, en el escritorio del usuario)
-            desktop_path = os.path.expanduser("~/Desktop")  # Esto obtiene la ruta del escritorio del usuario
+            desktop_path = os.path.expanduser("~/Desktop")
             filename = os.path.join(desktop_path, f'reporte_asistencia_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf')
-
-            # Guardar el archivo PDF en la ruta especificada
             self.pdf.output(filename)
             return filename
         except Exception as e:
