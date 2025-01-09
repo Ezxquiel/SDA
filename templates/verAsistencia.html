@@ -1,5 +1,9 @@
 {% extends "layout.html" %}
 {% block content %}
+
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/verAsistencia.css')}}">
+</head>
     <form method="POST" class="Formulario">
         <input type="text" id="Nie" name="busqueda" placeholder="000000000000" autofocus minlength="4" maxlength="15" autocomplete="off">
         <button type="submit">Buscar</button>
