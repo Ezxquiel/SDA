@@ -7,6 +7,7 @@ from routes.admin import admin_bp
 from routes.parents import parents_bp
 from routes.sections import sections_bp
 from routes.admintarde import admintarde_bp
+from routes.verasitencia import sections_bp
 from routes.admin_mañana import admin_mañana_bp
 from routes.registro_automatico import llamar_registro_automatico
 from routes.login import login_bp , inicio_bp
