@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/asistencia.css')}}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css')}}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/estudiantes.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css')}}">
     
     <title>{{ web_name }} - Instituto Nacional De Apopa INA</title>
  
@@ -36,12 +37,12 @@
                             <li><a href="/administracionAM">Turno Matutino</a></li>
                             <li><a href="/admintardePM">Turno Vespertino</a></li>
                         </ul>
+                    <li><a href="/verasistencia">ver asistencia</a></li>
                     {% endif %}
                     </li>
                     <li><a href="/asistencia">Entrada</a></li>
                     <li><a href="/salida">Salida</a></li>
-                    <div id="close"><a href="/logout">Cerrar sesión</a></div>
-                    <li><a href="/verasistencia">Salida</a></li>
+                    
 
                 </ul>
             </nav>

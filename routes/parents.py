@@ -40,4 +40,4 @@ def padres_router(cursor):
 
         return redirect(url_for('parents.padres_router'))
 
-    return render_template('padres.html')
+    return render_template('padres.html', web_name='Padres')

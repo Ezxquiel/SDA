@@ -176,5 +176,5 @@ def administracion():
                          resumen = resumen,
                          busqueda=busqueda,
                          fecha_inicio=fecha_inicio,
-                         fecha_fin=fecha_fin)
+                         fecha_fin=fecha_fin, web_name='Administración')
 

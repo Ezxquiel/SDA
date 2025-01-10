@@ -5,4 +5,4 @@ index_bp = Blueprint ('index', __name__)
 @index_bp.route('/index')
 def index():
 
-   return render_template("index.html")
+   return render_template("index.html", web_name="Sistema de control de asistencia")

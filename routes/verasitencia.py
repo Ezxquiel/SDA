@@ -1,16 +1,14 @@
 from flask import Blueprint, request, flash, redirect, url_for, render_template, session
-from models.database import db_operation
 from utils.auth_utils import login_required
-from models.database import get_db_connection
 from flask import Flask, render_template, request, flash
 from config.config import Config
-from models.database import db_operation, get_db_connection
+from models.datos import get_db_connection
 import logging
 import datetime
 
-sections_bp = Blueprint('sections_bp', __name__)
+verasitencia_bp = Blueprint('verasitencia_bp', __name__)
 
-@sections_bp.route('/verasistencia', methods=['GET', 'POST'])
+@verasitencia_bp.route('/verasistencia', methods=['GET', 'POST'])
 def index():
     titulo_web = "Inicio"
     conn = get_db_connection()
@@ -66,4 +64,4 @@ def index():
         else:
             flash("Por favor, ingresa un NIE o Código para buscar.", "warning")
 
-    return render_template('verAsistencia.html', asistencias_hoy=asistencias_hoy2, salidas_hoy=salidas_hoy, busqueda=busqueda, titulo_web=titulo_web)
+    return render_template('verasitencia_bp.html', asistencias_hoy=asistencias_hoy2, salidas_hoy=salidas_hoy, busqueda=busqueda, web_name=titulo_web)

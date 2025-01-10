@@ -5,10 +5,11 @@ class Config:
     DB_CONFIG = {
         'host': "127.0.0.1",
         'user': "root",
-        'password': "7003",
-        'database': "asistencia",
+        'password': "",
+        'database': "asistenciass",
         'cursorclass': 'DictCursor'
     }
+
 
 """
 

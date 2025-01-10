@@ -1,6 +1,4 @@
 
-
-
 main {
     width: 100%;
     display: flex;
@@ -28,6 +26,7 @@ main {
     display: flex;
     align-items: center;
     justify-content: space-around;
+    flex-direction: row;
 }
 
 .Formulario input {
@@ -52,6 +51,8 @@ main {
     color: #fbff02; /* Amarillo */
     font-weight: bold;
     transition: 0.5s all;
+    margin-top: 0;
+    padding: 0;
 }
 
 .Formulario button:hover {

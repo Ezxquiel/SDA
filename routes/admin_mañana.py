@@ -128,7 +128,7 @@ def administracionM():
         print(f"Error general: {str(e)}")
         flash("Ocurrió un error inesperado.", "danger")
         return render_template('matutino.html', resumen=[], totales={}, busqueda='', 
-                             fecha_inicio=fecha_inicio, fecha_fin=fecha_fin)
+                             fecha_inicio=fecha_inicio, fecha_fin=fecha_fin, web_name='Matutino')
 
     finally:
         if conn:

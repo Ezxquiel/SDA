@@ -131,4 +131,4 @@ def administracionPM():
             conn.close()
 
     return render_template('vespertino.html', resumen=resumen, totales=totales, busqueda=busqueda, 
-                         fecha_inicio=fecha_inicio, fecha_fin=fecha_fin)
+                         fecha_inicio=fecha_inicio, fecha_fin=fecha_fin, web_name='Vespertino')
