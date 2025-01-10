@@ -1,7 +1,6 @@
 from flask import Blueprint, request, flash, redirect, url_for, render_template, jsonify
 from models.database import db_operation
 from datetime import datetime, time as dt_time
-from datetime import datetime
 
 attendance_bp = Blueprint('attendance', __name__)
 
@@ -17,20 +16,24 @@ def asistencia_router(cursor):
 
             if estudiante:
                 fecha_actual = datetime.now().date()
-                hora_actual = datetime.now().time() 
+                hora_actual = datetime.now().time()
 
-                # Comprobar si la entrada fue registrada entre las 6 y las 13:00
-                if dt_time(6, 0) <= hora_actual <= dt_time(17, 12):
-                    cursor.execute(
-                        "INSERT INTO entrada (nie, fecha_entrada, hora_entrada) VALUES (%s, %s, %s)",
-                        (nie_estudiante, fecha_actual, hora_actual)
-                    )
-                    flash('Asistencia registrada con éxito.', 'success')
-                cursor.execute(
-                    "INSERT INTO entrada (nie, fecha_entrada, hora_entrada) VALUES (%s, %s, %s)",
-                    (nie_estudiante, fecha_actual, hora_actual)
-                )
-                flash('Asistencia registrada con éxito.', 'success')
+                # Verificar si ya existe una entrada en el mismo minuto
+                cursor.execute("""
+                    SELECT * FROM entrada 
+                    WHERE nie = %s AND fecha_entrada = %s AND EXTRACT(MINUTE FROM hora_entrada) = EXTRACT(MINUTE FROM %s)
+                """, (nie_estudiante, fecha_actual, hora_actual))
+                entrada_existente = cursor.fetchone()
+
+                if entrada_existente:
+                    flash('Ya existe una entrada registrada en el mismo minuto.', 'warning')
+                else:
+                    # Comprobar si la entrada fue registrada entre las 6 y las 13:00
+                        cursor.execute(
+                            "INSERT INTO entrada (nie, fecha_entrada, hora_entrada) VALUES (%s, %s, %s)",
+                            (nie_estudiante, fecha_actual, hora_actual)
+                        )
+                        flash('Asistencia registrada con éxito.', 'success')
             else:
                 flash('El estudiante con ese NIE no existe.', 'danger')
 
@@ -59,7 +62,7 @@ def registrar_entrada_automatica(cursor):
                 FROM salida 
                 WHERE fecha_salida = %s
             )
-        """, (fecha_actual, dt_time(6, 0), dt_time(19, 00), fecha_actual))
+        """, (fecha_actual, dt_time(6, 0), dt_time(21, 00), fecha_actual))
         
         estudiantes_sin_salida = cursor.fetchall()
 
@@ -75,8 +78,6 @@ def registrar_entrada_automatica(cursor):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-
 @attendance_bp.route('/salida', methods=['GET', 'POST'])
 @db_operation
 def salida_router(cursor):
@@ -91,11 +92,22 @@ def salida_router(cursor):
                 # Fecha y hora para registrar la salida
                 fecha_actual = datetime.now().date()
                 hora_actual = datetime.now().time()
-                cursor.execute(
-                    "INSERT INTO salida (nie, fecha_entrada, hora_entrada) VALUES (%s, %s, %s)",
-                    (nie_estudiante, fecha_actual, hora_actual)
-                )
-                flash('Salida registrada con éxito.', 'success')
+
+                # Verificar si ya existe una salida en el mismo minuto
+                cursor.execute("""
+                    SELECT * FROM salida 
+                    WHERE nie = %s AND fecha_salida = %s AND EXTRACT(MINUTE FROM hora_salida) = EXTRACT(MINUTE FROM %s)
+                """, (nie_estudiante, fecha_actual, hora_actual))
+                salida_existente = cursor.fetchone()
+
+                if salida_existente:
+                    flash('Ya existe una salida registrada en el mismo minuto.', 'warning')
+                else:
+                    cursor.execute(
+                        "INSERT INTO salida (nie, fecha_salida, hora_salida) VALUES (%s, %s, %s)",
+                        (nie_estudiante, fecha_actual, hora_actual)
+                    )
+                    flash('Salida registrada con éxito.', 'success')
             else:
                 flash('El estudiante con ese NIE no existe.', 'danger')
 

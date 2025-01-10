@@ -1,5 +1,7 @@
 import os
 
+"""
+
 class Config:
     SECRET_KEY = os.urandom(24)
     DB_CONFIG = {
@@ -13,7 +15,6 @@ class Config:
 
 """
 
-German
 
 class Config:
     SECRET_KEY = os.urandom(24)
@@ -24,5 +25,4 @@ class Config:
         'database': "asistencia",
         'cursorclass': 'DictCursor'
     }
-
-"""    
+ 
