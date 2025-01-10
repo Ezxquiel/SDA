@@ -23,7 +23,7 @@
                         <ul>
                             {% for asistencia in asistencias_hoy %}
                                 <li>
-                                    <strong class="faq-titulos">{{ asistencia['fecha'] }} a las {{ asistencia['hora'] }} - Entrada</strong>
+                                    <strong class="faq-titulos">{{ asistencia['fecha_entrada'] }} a las {{ asistencia['hora_entrada'] }} - Entrada</strong>
                                 </li>
                             {% endfor %}
                         </ul>
@@ -48,7 +48,7 @@
                         <ul>
                             {% for salida in salidas_hoy %}
                                 <li>
-                                    <strong class="faq-titulos">{{ salida['fecha'] }} a las {{ salida['hora'] }} - Salida</strong>
+                                    <strong class="faq-titulos">{{ salida['fecha_salida'] }} a las {{ salida['hora_salida'] }} - Salida</strong>
                                 </li>
                             {% endfor %}
                         </ul>
@@ -84,7 +84,7 @@
                     {% for asistencia in asistencias_hoy %}
                         {
                             title: 'Asistencia',
-                            start: '{{ asistencia["fecha"] }}',
+                            start: '{{ asistencia["fecha_entrada"] }}',
                             color: 'green'
                         },
                     {% endfor %}

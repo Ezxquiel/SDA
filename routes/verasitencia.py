@@ -30,11 +30,11 @@ def index():
                 with conn.cursor() as cursor:
                     # Consulta para entradas
                     cursor.execute(
-                        """SELECT e.*, ent.id_entrada, ent.fecha, ent.hora 
+                        """SELECT e.*, ent.id_entrada, ent.fecha_entrada, ent.hora_entrada 
                            FROM entrada ent
                            JOIN estudiantes e ON ent.nie = e.nie 
                            WHERE (e.nie LIKE %s OR e.codigo LIKE %s) 
-                           ORDER BY ent.fecha DESC, ent.hora DESC""",
+                           ORDER BY ent.fecha_entrada DESC, ent.hora_entrada DESC""",
                         ('%' + busqueda + '%', '%' + busqueda + '%')
                     )
                     asistencias_hoy2 = cursor.fetchall()
@@ -42,11 +42,11 @@ def index():
 
                     # Consulta para salidas
                     cursor.execute(
-                        """SELECT e.nombre, e.codigo, e.nie, sal.id_salida, sal.fecha, sal.hora 
+                        """SELECT e.nombre, e.codigo, e.nie, sal.id_salida, sal.fecha_salida, sal.hora_salida 
                            FROM salida sal
                            JOIN estudiantes e ON sal.nie = e.nie 
                            WHERE (e.nie LIKE %s OR e.codigo LIKE %s) 
-                           ORDER BY sal.fecha DESC, sal.hora DESC""",
+                           ORDER BY sal.fecha_salida DESC, sal.hora_salida DESC""",
                         ('%' + busqueda + '%', '%' + busqueda + '%')
                     )
                     salidas_hoy = cursor.fetchall()
