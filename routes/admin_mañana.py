@@ -64,10 +64,10 @@ def administracionM():
                             GROUP_CONCAT(CASE WHEN e.nie IS NULL THEN est.codigo END) AS codigos_inasistidos,
                             GROUP_CONCAT(CASE WHEN e.nie IS NOT NULL THEN est.codigo END) AS codigos_asistidos
                         FROM estudiantes est
-                        LEFT JOIN entrada e ON est.nie = e.nie AND DATE(e.fecha) BETWEEN %s AND %s
+                        LEFT JOIN entrada e ON est.nie = e.nie AND DATE(e.fecha_entrada) BETWEEN %s AND %s
                         JOIN seccion sec ON est.año = sec.año AND est.seccion = sec.seccion
                         WHERE est.genero IN ('M', 'F')
-                        AND (e.nie IS NULL OR TIME(e.hora) BETWEEN '04:00:00' AND '12:44:59')
+                        AND (e.nie IS NULL OR TIME(e.hora_entrada) BETWEEN '04:00:00' AND '12:44:59')
                         {0}
                         GROUP BY sec.año, sec.seccion
                         ORDER BY sec.año, sec.seccion
@@ -82,10 +82,10 @@ def administracionM():
                             COUNT(CASE WHEN e.nie IS NULL THEN 1 END) AS total_inasistidos,
                             ROUND(100.0 * COUNT(DISTINCT e.nie) / NULLIF(COUNT(DISTINCT e.nie) + COUNT(CASE WHEN e.nie IS NULL THEN 1 END), 0), 2) AS porcentaje_asistencia
                         FROM estudiantes est
-                        LEFT JOIN entrada e ON est.nie = e.nie AND DATE(e.fecha) BETWEEN %s AND %s
+                        LEFT JOIN entrada e ON est.nie = e.nie AND DATE(e.fecha_entrada) BETWEEN %s AND %s
                         JOIN seccion sec ON est.año = sec.año AND est.seccion = sec.seccion
                         WHERE est.genero IN ('M', 'F')
-                        AND (e.nie IS NULL OR TIME(e.hora) BETWEEN '04:00:00' AND '12:44:59')
+                        AND (e.nie IS NULL OR TIME(e.hora_entrada) BETWEEN '04:00:00' AND '12:44:59')
                         {0}
                     """.format("AND CONCAT(sec.año, sec.seccion) LIKE %s" if busqueda else "")
 

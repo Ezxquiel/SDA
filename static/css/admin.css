@@ -100,7 +100,7 @@
     margin-right: 10px;
 }
 
-.btn-primary, .btn-search, .btn-secondary {
+.btn {
     padding: 12px 24px;
     font-size: 1em;
     border: none;
@@ -165,9 +165,7 @@
 }
 
 /* Button ripple effect */
-.btn-primary::after,
-.btn-search::after,
-.btn-secondary::after {
+.btn::after {
     content: '';
     position: absolute;
     top: 50%;
@@ -180,26 +178,20 @@
     transition: width 0.3s ease-out, height 0.3s ease-out;
 }
 
-.btn-primary:active::after,
-.btn-search:active::after,
-.btn-secondary:active::after {
+.btn:active::after {
     width: 200px;
     height: 200px;
     opacity: 0;
 }
 
 /* Focus styles for accessibility */
-.btn-primary:focus,
-.btn-search:focus,
-.btn-secondary:focus {
+.btn:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
 }
 
 /* Disabled state */
-.btn-primary:disabled,
-.btn-search:disabled,
-.btn-secondary:disabled {
+.btn:disabled {
     opacity: 0.65;
     cursor: not-allowed;
     transform: none;
@@ -276,7 +268,7 @@
         width: 100%;
     }
 
-    .btn-primary, .btn-search, .btn-secondary {
+    .btn {
         width: 100%;
         padding: 10px;
     }

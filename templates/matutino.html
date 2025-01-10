@@ -34,7 +34,9 @@
             <tbody>
                 {% for asistencia in resumen %}
                 <tr>
-                    <td>{{ asistencia.año }} - {{ asistencia.seccion }}</td>
+                    <a href="{{ url_for('ruta_detalles_seccion', año=asistencia.año, seccion=asistencia.seccion) }}">
+                        {{ asistencia.año }} - {{ asistencia.seccion }}
+                    </a>
                     <td>{{ asistencia.total_asistidos }}</td>
                     <td>{{ asistencia.total_masculino }}</td>
                     <td>{{ asistencia.total_femenino }}</td>

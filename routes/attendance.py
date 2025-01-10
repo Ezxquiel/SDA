@@ -17,17 +17,17 @@ def asistencia_router(cursor):
 
             if estudiante:
                 fecha_actual = datetime.now().date()
-                hora_actual = datetime.now().time()
+                hora_actual = datetime.now().time() 
 
                 # Comprobar si la entrada fue registrada entre las 6 y las 13:00
-                if dt_time(6, 0) <= hora_actual <= dt_time(13, 12):
+                if dt_time(6, 0) <= hora_actual <= dt_time(17, 12):
                     cursor.execute(
-                        "INSERT INTO entrada (nie, fecha, hora) VALUES (%s, %s, %s)",
+                        "INSERT INTO entrada (nie, fecha_entrada, hora_entrada) VALUES (%s, %s, %s)",
                         (nie_estudiante, fecha_actual, hora_actual)
                     )
                     flash('Asistencia registrada con éxito.', 'success')
                 cursor.execute(
-                    "INSERT INTO entrada (nie, fecha, hora) VALUES (%s, %s, %s)",
+                    "INSERT INTO entrada (nie, fecha_entrada, hora_entrada) VALUES (%s, %s, %s)",
                     (nie_estudiante, fecha_actual, hora_actual)
                 )
                 flash('Asistencia registrada con éxito.', 'success')
@@ -53,20 +53,20 @@ def registrar_entrada_automatica(cursor):
         cursor.execute("""
             SELECT nie 
             FROM entrada 
-            WHERE fecha = %s AND hora BETWEEN %s AND %s
+            WHERE fecha_entrada = %s AND hora_entrada BETWEEN %s AND %s
             AND nie NOT IN (
                 SELECT nie 
                 FROM salida 
-                WHERE fecha = %s
+                WHERE fecha_salida = %s
             )
-        """, (fecha_actual, dt_time(6, 0), dt_time(12, 00), fecha_actual))
+        """, (fecha_actual, dt_time(6, 0), dt_time(19, 00), fecha_actual))
         
         estudiantes_sin_salida = cursor.fetchall()
 
         # Insertar entrada automática para cada estudiante que cumple las condiciones
         for estudiante in estudiantes_sin_salida:
             cursor.execute(
-                "INSERT INTO entrada (nie, fecha, hora) VALUES (%s, %s, %s)",
+                "INSERT INTO entrada (nie, fecha_entrada, hora_entrada) VALUES (%s, %s, %s)",
                 (estudiante['nie'], fecha_actual, hora_automatica)
             )
 
@@ -92,7 +92,7 @@ def salida_router(cursor):
                 fecha_actual = datetime.now().date()
                 hora_actual = datetime.now().time()
                 cursor.execute(
-                    "INSERT INTO salida (nie, fecha, hora) VALUES (%s, %s, %s)",
+                    "INSERT INTO salida (nie, fecha_entrada, hora_entrada) VALUES (%s, %s, %s)",
                     (nie_estudiante, fecha_actual, hora_actual)
                 )
                 flash('Salida registrada con éxito.', 'success')
