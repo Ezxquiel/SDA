@@ -1,15 +1,6 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        <ul class="flashes">
-            {% for category, message in messages %}
-                <li class="{{ category }}">{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-{% endwith %}
 
 <div class="Formulario card shadow-lg">
     <div class="card-header">
@@ -60,6 +51,7 @@
             <select name="genero" class="form-control" required>
                 <option value="M">Masculino</option>
                 <option value="F">Femenino</option>
+            </select>
         </div>
 
         <div class="card-footer text-center">
