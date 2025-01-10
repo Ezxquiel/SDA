@@ -21,7 +21,6 @@ body {
 }
 
 .wrap {
-    max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
     display: flex;
@@ -35,6 +34,11 @@ body {
 }
 
 /* Nav */
+
+.nav{
+    display: flex;
+    margin-left: auto;
+}
 .nav ul {
     display: flex;
     list-style: none;
@@ -45,13 +49,12 @@ body {
     color: var(--white);
     text-decoration: none;
     padding: 8px 12px;
-    border-radius: 4px;
     transition: 0.3s;
+    border-bottom: 1px rgba(255, 255, 255, 0) solid;
 }
 
 .nav a:hover {
-    background: var(--accent-yellow);
-    color: var(--secondary-blue);
+    border-bottom: 1px white solid;
 }
 
 /* Dropdown */
@@ -64,7 +67,6 @@ body {
     position: absolute;
     top: 100%;
     left: 0;
-    background: var(--white);
     min-width: 200px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     border-radius: 4px;
