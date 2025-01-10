@@ -104,4 +104,4 @@ def salida_router(cursor):
 
         return redirect(url_for('attendance.salida_router'))
 
-    return render_template('/salida.html')
+    return render_template('/salida.html', web_name='Salida')

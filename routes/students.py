@@ -58,4 +58,4 @@ def estudiantes_router(cursor):
             
         return redirect(url_for('students.estudiantes_router'))
 
-    return render_template('estudiantes.html',  secciones=secciones, anios=anios)
+    return render_template('estudiantes.html',  secciones=secciones, anios=anios, web_name='Estudiantes')

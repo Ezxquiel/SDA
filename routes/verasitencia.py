@@ -64,4 +64,4 @@ def index():
         else:
             flash("Por favor, ingresa un NIE o Código para buscar.", "warning")
 
-    return render_template('verasitencia_bp.html', asistencias_hoy=asistencias_hoy2, salidas_hoy=salidas_hoy, busqueda=busqueda, titulo_web=titulo_web)
+    return render_template('verasitencia_bp.html', asistencias_hoy=asistencias_hoy2, salidas_hoy=salidas_hoy, busqueda=busqueda, web_name=titulo_web)

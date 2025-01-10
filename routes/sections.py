@@ -24,4 +24,4 @@ def secciones_router(cursor):
             
         return redirect(url_for('sections.secciones_router'))
 
-    return render_template('/secciones.html')
+    return render_template('/secciones.html', web_name='Secciones')
