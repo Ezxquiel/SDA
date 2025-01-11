@@ -1,8 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
 
-
-
 <div class="admin-container">
     <h1 class="page-title">Administración Vespertina</h1>
 
@@ -10,9 +8,7 @@
         <input type="text" name="busqueda" placeholder="Buscar Por Sección...." autocomplete="off" autofocus>
         <input type="date" name="fecha_inicio" placeholder="Fecha Inicio">
         <input type="date" name="fecha_fin" placeholder="Fecha fin">
-        <button type="submit" name="descargar_pdf" value="1" class="btn btn-primary">
-            Descargar PDF
-        </button>
+        <button type="submit" name="descargar_pdf" value="1" class="btn btn-primary">Descargar PDF</button>
         <button type="submit" class="btn-search">Buscar</button>
         <button type="submit" class="btn btn-secondary" name="mostrar_todo" value="1">Ver Todas las Secciones</button>
     </form>
@@ -23,6 +19,7 @@
         <table class="records-table">
             <thead>
                 <tr>
+                    <th>Fecha</th>
                     <th>Sección</th>
                     <th>Asistidos</th>
                     <th>M</th>
@@ -35,16 +32,13 @@
             <tbody>
                 {% for asistencia in resumen %}
                 <tr>
-                    <td>
-                    <a href="{{ url_for('informe.ruta_detalles_seccion', anio=asistencia.año, seccion=asistencia.seccion) }}">
-                        {{ asistencia.año }} - {{ asistencia.seccion }}
-                    </td>
-                    </a>
+                    <td>{{ asistencia.fecha }}</td>
+                    <td><a href="#SeccionAll">{{ asistencia.año }} - {{ asistencia.seccion }}</a></td>
                     <td>{{ asistencia.total_asistidos }}</td>
                     <td>{{ asistencia.total_masculino }}</td>
                     <td>{{ asistencia.total_femenino }}</td>
                     <td>{{ asistencia.total_inasistidos or 0 }}</td>
-                    <td>{{ asistencia.total_asistidos + asistencia.total_inasistidos }}</td> <!-- Total calculado -->
+                    <td>{{ asistencia.total_asistidos + asistencia.total_inasistidos }}</td>
                     <td style="overflow-x: auto; max-width: 290px;">{{ asistencia.codigos_inasistidos or 'N/A' }}</td>
                 </tr>
                 {% endfor %}
@@ -58,7 +52,7 @@
     <div class="records-table">
         <h2 class="section-title">Estadistica General Vespertina</h2>
         {% if totales %}
-        <table class="table mt-4">
+        <table class="table mt-4"></table>
             <thead>
                 <tr>
                     <th colspan="7" class="text-center">Totales del Turno</th>
@@ -82,35 +76,23 @@
             </tbody>
         </table>
         {% endif %}
-
-
-
-
-
     </div>
-
 </div>
 
 <h3 style="margin: 30px;">Porcentaje de asistencia</h3>
 
-<div class="chart-wrap horizontal" style="width: 90%;">
+<div class="chart-wrap horizontal" style="width: 70%;">
     <div class="grid">
         {% for asistencia in resumen %}
-        <div class="bar" style="--bar-value:{{ asistencia.porcentaje_asistencia }}%;"
-            data-name="{{ asistencia.seccion }} - {{ asistencia.porcentaje_asistencia }}%">
-        </div>
+        <div class="bar" style="--bar-value:{{ asistencia.porcentaje_asistencia }}%;" data-name="{{ asistencia.seccion }} - {{ asistencia.porcentaje_asistencia }}%"></div>
         {% endfor %}
     </div>
     <h3 style="margin: 30px;">Porcentaje de asistencia</h3>
-
     <div class="grid">
         {% for asistencia in resumen %}
-        <div class="bar" style="--bar-value:{{ asistencia.total_asistidos + asistencia.total_inasistidos }}%;"
-            data-name=" Total de alumnos {{ asistencia.total_asistidos + asistencia.total_inasistidos }} de {{ asistencia.año }}{{ asistencia.seccion }}">
-        </div>
+        <div class="bar" style="--bar-value:{{ asistencia.total_asistidos + asistencia.total_inasistidos }}%;" data-name="Total de alumnos {{ asistencia.total_asistidos + asistencia.total_inasistidos }} de {{ asistencia.año }}{{ asistencia.seccion }}"></div>
         {% endfor %}
     </div>
 </div>
-
 
 {% endblock %}

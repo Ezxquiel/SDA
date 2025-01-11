@@ -51,6 +51,8 @@ def administracionM():
                     # Consulta principal con filtro de búsqueda
                     consulta_detalle = """
                         SELECT
+                            DATE(e.fecha_entrada) AS fecha,
+                            DAYNAME(e.fecha_entrada) AS dia_semana,
                             sec.año,
                             sec.seccion,
                             COUNT(DISTINCT e.nie) AS total_asistidos,
@@ -66,43 +68,22 @@ def administracionM():
                         WHERE est.genero IN ('M', 'F')
                         AND (e.nie IS NULL OR TIME(e.hora_entrada) BETWEEN '04:00:00' AND '12:44:59')
                         {0}
-                        GROUP BY sec.año, sec.seccion
-                        ORDER BY sec.año, sec.seccion
-                    """.format("AND CONCAT(sec.año, sec.seccion) LIKE %s" if busqueda else "")
-
-                    # Consulta para totales
-                    consulta_totales = """
-                        SELECT
-                            COUNT(DISTINCT e.nie) AS total_asistidos,
-                            COUNT(DISTINCT CASE WHEN est.genero = 'M' AND e.nie IS NOT NULL THEN e.nie END) AS total_masculino,
-                            COUNT(DISTINCT CASE WHEN est.genero = 'F' AND e.nie IS NOT NULL THEN e.nie END) AS total_femenino,
-                            COUNT(CASE WHEN e.nie IS NULL THEN 1 END) AS total_inasistidos,
-                            ROUND(100.0 * COUNT(DISTINCT e.nie) / NULLIF(COUNT(DISTINCT e.nie) + COUNT(CASE WHEN e.nie IS NULL THEN 1 END), 0), 2) AS porcentaje_asistencia
-                        FROM estudiantes est
-                        LEFT JOIN entrada e ON est.nie = e.nie AND DATE(e.fecha_entrada) BETWEEN %s AND %s
-                        JOIN seccion sec ON est.año = sec.año AND est.seccion = sec.seccion
-                        WHERE est.genero IN ('M', 'F')
-                        AND (e.nie IS NULL OR TIME(e.hora_entrada) BETWEEN '04:00:00' AND '12:44:59')
-                        {0}
+                        GROUP BY DATE(e.fecha_entrada), sec.año, sec.seccion
+                        ORDER BY DATE(e.fecha_entrada), sec.año, sec.seccion
                     """.format("AND CONCAT(sec.año, sec.seccion) LIKE %s" if busqueda else "")
 
                     # Preparar parámetros
                     params_detalle = [fecha_inicio, fecha_fin]
-                    params_totales = [fecha_inicio, fecha_fin]
                     
                     if busqueda:
                         params_detalle.append(f'%{busqueda}%')
-                        params_totales.append(f'%{busqueda}%')
 
                     # Ejecutar consultas
                     cursor.execute(consulta_detalle, tuple(params_detalle))
                     resumen = cursor.fetchall()
-                    
-                    cursor.execute(consulta_totales, tuple(params_totales))
-                    totales = cursor.fetchone()
 
                     # Verificar si se debe generar PDF
-                    if descargar_pdf and resumen and totales:
+                    if descargar_pdf and resumen:
                         try:
                             report = AttendanceReport(resumen, totales, fecha_inicio, fecha_fin)
                             pdf_filename = report.generate()

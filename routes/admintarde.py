@@ -58,7 +58,8 @@ def administracionPM():
                             COUNT(CASE WHEN e.nie IS NULL THEN 1 END) AS total_inasistidos,
                             ROUND(100.0 * COUNT(DISTINCT e.nie) / NULLIF(COUNT(DISTINCT e.nie) + COUNT(CASE WHEN e.nie IS NULL THEN 1 END), 0), 2) AS porcentaje_asistencia,
                             GROUP_CONCAT(CASE WHEN e.nie IS NULL THEN est.codigo END) AS codigos_inasistidos,
-                            GROUP_CONCAT(CASE WHEN e.nie IS NOT NULL THEN est.codigo END) AS codigos_asistidos
+                            GROUP_CONCAT(CASE WHEN e.nie IS NOT NULL THEN est.codigo END) AS codigos_asistidos,
+                            MIN(DATE(e.fecha_entrada)) AS fecha_primera_asistencia
                         FROM estudiantes est
                         LEFT JOIN entrada e ON est.nie = e.nie AND DATE(e.fecha_entrada) BETWEEN %s AND %s
                         JOIN seccion sec ON est.año = sec.año AND est.seccion = sec.seccion
@@ -129,6 +130,11 @@ def administracionPM():
     finally:
         if conn:
             conn.close()
+
+    # Add the date and day of the week to each record in the summary
+    for record in resumen:
+        record['fecha'] = record['fecha_primera_asistencia'].strftime('%Y-%m-%d') if record['fecha_primera_asistencia'] else fecha_inicio.strftime('%Y-%m-%d')
+        record['dia_semana'] = record['fecha_primera_asistencia'].strftime('%A') if record['fecha_primera_asistencia'] else fecha_inicio.strftime('%A')
 
     return render_template('vespertino.html', resumen=resumen, totales=totales, busqueda=busqueda, 
                          fecha_inicio=fecha_inicio, fecha_fin=fecha_fin, web_name='Vespertino')
