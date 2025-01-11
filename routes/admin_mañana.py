@@ -5,15 +5,12 @@ from datetime import datetime, date
 from utils.pdf_generator import AttendanceReport
 from utils.auth_utils import login_required, admin_required
 
-
 admin_mañana_bp = Blueprint('admin_mañana', __name__)
 
 @admin_mañana_bp.route('/administracionAM', methods=['GET', 'POST'])
 @login_required
 @admin_required
-
 def administracionM():
-
     if 'user_id' not in session:
         flash("Debes iniciar sesión para acceder", "warning")
         return redirect('/login')

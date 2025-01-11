@@ -33,6 +33,7 @@ app.register_blueprint(login_bp)
 app.register_blueprint(inicio_bp)
 app.register_blueprint(index_bp)
 
+
 app.register_blueprint(informe_bp, url_prefix='/informe')
 
 app.register_blueprint(verasitencia_bp)

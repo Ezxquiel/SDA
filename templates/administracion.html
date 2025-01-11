@@ -4,10 +4,10 @@
 <div class="admin-container">
     <h1 class="page-title">Administración de Asistencia y Salida</h1>
 
-    <form class="search-form" method="POST" action="/administracion">
-        <input type="text" name="busqueda" placeholder="Buscar por NIE o código..." required autocomplete="off" autofocus>
-        <input type="date" name="fecha_inicio" placeholder="Fecha de inicio">
-        <input type="date" name="fecha_fin" placeholder="Fecha de fin">
+    <form class="search-form" method="POST" action="{{ url_for('admin_mañana.administracionM') }}">
+        <input type="text" name="busqueda" placeholder="Buscar por NIE o código..." required autocomplete="off" autofocus value="{{ busqueda }}">
+        <input type="date" name="fecha_inicio" placeholder="Fecha de inicio" value="{{ fecha_inicio }}">
+        <input type="date" name="fecha_fin" placeholder="Fecha de fin" value="{{ fecha_fin }}">
         <button type="submit" name="descargar_pdf" value="true" class="btn-download">
             Descargar PDF
         </button>
@@ -15,7 +15,6 @@
             Buscar
         </button>
     </form>
-
 
     <div class="records-section">
         <h2 class="section-title">RESUMEN</h2>
@@ -59,7 +58,6 @@
             {% endfor %}
         </ul>
     </div>
-    
 
     <div class="records-section">
         <h2 class="section-title">Registro de Entradas</h2>
@@ -124,6 +122,5 @@
         <div class="empty-message">No se encontraron registros de salida.</div>
         {% endif %}
     </div>
- 
 </div>
 {% endblock %}
