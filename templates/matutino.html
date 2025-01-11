@@ -3,104 +3,156 @@
 {% block content %}
 
 <div class="admin-container">
-    <h1 class="page-title">Administración Matutina</h1>
 
-    <form class="search-form" method="POST" action="/administracionAM" >
-        <input type="text" name="busqueda" placeholder="Buscar Por Sección...." autocomplete="off" autofocus>
-        <input type="date" name="fecha_inicio" placeholder="Fecha Inicio">
-        <input type="date" name="fecha_fin" placeholder="Fecha fin">
-        <button type="submit" name="descargar_pdf" value="1" class="btn btn-primary">
-            Descargar PDF
-        </button>
-        <button type="submit" class="btn-search">Buscar</button>
-        <button type="submit" class="btn-secondary" name="mostrar_todo" value="1">Ver Todas las Secciones</button>
-    </form>
+    <header class="dashboard-header">
+        <h1 class="page-title">Administración Matutina</h1>
+    </header>
 
-    <div class="records-section">
-        <h2 class="section-title">Resumen</h2>
+    <!-- Search and Filter Section -->
+    <section class="search-section">
+        <form class="search-form" method="POST" action="/administracionAM">
+            <div class="form-group">
+                <input type="text" 
+                       name="busqueda" 
+                       placeholder="Buscar Por Sección...." 
+                       autocomplete="off" 
+                       autofocus>
+            </div>
+            <div class="form-group date-range">
+                <input type="date" name="fecha_inicio" placeholder="Fecha Inicio">
+                <input type="date" name="fecha_fin" placeholder="Fecha fin">
+            </div>
+            <div class="form-actions">
+                <button type="submit" name="descargar_pdf" value="1" class="btn btn-primary">
+                    <i class="fas fa-download"></i> Descargar PDF
+                </button>
+                <button type="submit" class="btn btn-search">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+                <button type="submit" class="btn btn-secondary" name="mostrar_todo" value="1">
+                    <i class="fas fa-list"></i> Ver Todas las Secciones
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <!-- Summary Section -->
+    <section class="records-section">
+        <div class="section-header">
+            <h2 class="section-title">Resumen de Asistencia</h2>
+        </div>
+        
         {% if resumen %}
-        <table class="records-table">
-            <thead>
-                <tr>
-                    <th>Sección</th>
-                    <th>Asistidos</th>
-                    <th>M</th>
-                    <th>F</th>
-                    <th>Inasistidos</th>
-                    <th>Total</th>
-                    <th>Códigos de Inasistidos</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for asistencia in resumen %}
-                <tr>
-                    <a href="{{ url_for('ruta_detalles_seccion', año=asistencia.año, seccion=asistencia.seccion) }}">
-                        {{ asistencia.año }} - {{ asistencia.seccion }}
-                    </a>
-                    <td>{{ asistencia.total_asistidos }}</td>
-                    <td>{{ asistencia.total_masculino }}</td>
-                    <td>{{ asistencia.total_femenino }}</td>
-                    <td>{{ asistencia.total_inasistidos or 0 }}</td>
-                    <td>{{ asistencia.total_asistidos + asistencia.total_inasistidos }}</td> <!-- Total calculado -->
-                    <td style="overflow-x: auto; max-width: 290px;">{{ asistencia.codigos_inasistidos or 'N/A' }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="records-table">
+                <thead>
+                    <tr>
+                        <th>Sección</th>
+                        <th>Asistidos</th>
+                        <th>M</th>
+                        <th>F</th>
+                        <th>Inasistidos</th>
+                        <th>Total</th>
+                        <th>Códigos de Inasistidos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for asistencia in resumen %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('informe.ruta_detalles_seccion', 
+                                                anio=asistencia.año, 
+                                                seccion=asistencia.seccion,
+                                                fecha_inicio=fecha_inicio|string,
+                                                fecha_fin=fecha_fin|string) }}"
+                               class="section-link">
+                                {{ asistencia.año }} - {{ asistencia.seccion }}
+                            </a>
+                        </td>
+                        <td>{{ asistencia.total_asistidos }}</td>
+                        <td>{{ asistencia.total_masculino }}</td>
+                        <td>{{ asistencia.total_femenino }}</td>
+                        <td>{{ asistencia.total_inasistidos or 0 }}</td>
+                        <td>{{ asistencia.total_asistidos + asistencia.total_inasistidos }}</td>
+                        <td class="codes-cell">{{ asistencia.codigos_inasistidos or 'N/A' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         {% else %}
-        <div class="empty-message">No se encontraron Registros</div>
+        <div class="empty-message">
+            <i class="fas fa-info-circle"></i>
+            <p>No se encontraron Registros</p>
+        </div>
         {% endif %}
-    </div>
+    </section>
 
-    <div class="records-section">
-        <h2 class="section-title">Estadistica General Matutina</h2>
+    <!-- Statistics Section -->
+    <section class="statistics-section">
+        <div class="section-header">
+            <h2 class="section-title">Estadística General Matutina</h2>
+        </div>
+        
         {% if totales %}
-        <table class="records-table">
-            <thead>
-                <tr>
-                    <th>Total Asistidos</th>
-                    <th>Total Masculino</th>
-                    <th>Total Femenino</th>
-                    <th>Total Inasistidos</th>
-                    <th>% Asistencia Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{{ totales.total_asistidos }}</td>
-                    <td>{{ totales.total_masculino }}</td>
-                    <td>{{ totales.total_femenino }}</td>
-                    <td>{{ totales.total_inasistidos }}</td>
-                    <td>{{ totales.porcentaje_asistencia }}%</td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="statistics-table">
+                <thead>
+                    <tr>
+                        <th colspan="5" class="text-center">Totales del Turno</th>
+                    </tr>
+                    <tr>
+                        <th>Total Asistidos</th>
+                        <th>Total Masculino</th>
+                        <th>Total Femenino</th>
+                        <th>Total Inasistidos</th>
+                        <th>% Asistencia Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ totales.total_asistidos }}</td>
+                        <td>{{ totales.total_masculino }}</td>
+                        <td>{{ totales.total_femenino }}</td>
+                        <td>{{ totales.total_inasistidos }}</td>
+                        <td class="percentage">{{ totales.porcentaje_asistencia }}%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
         {% endif %}
+    </section>
 
-
-
-    </div>
-
-</div>
-
-<h3 style="margin: 30px;">Porcentaje de asistencia</h3>
-
-<div class="chart-wrap horizontal" style="width: 90%;">
-    <div class="grid">
-        {% for asistencia in resumen %}
-        <div class="bar" style="--bar-value:{{ asistencia.porcentaje_asistencia }}%;" data-name="{{ asistencia.seccion }} - {{ asistencia.porcentaje_asistencia }}%">
+    <!-- Charts Section -->
+    <section class="charts-section">
+        <div class="chart-container">
+            <h3 class="chart-title">Porcentaje de Asistencia por Sección</h3>
+            <div class="chart-wrap horizontal">
+                <div class="grid">
+                    {% for asistencia in resumen %}
+                    <div class="bar" 
+                         style="--bar-value:{{ asistencia.porcentaje_asistencia }}%;"
+                         data-name="{{ asistencia.seccion }} - {{ asistencia.porcentaje_asistencia }}%">
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
-        {% endfor %}
-    </div>
-    <h3 style="margin: 30px;">Porcentaje de asistencia</h3>
 
-    <div class="grid">
-        {% for asistencia in resumen %}
-        <div class="bar" style="--bar-value:{{ asistencia.total_asistidos + asistencia.total_inasistidos }}%;" data-name=" Total de alumnos {{ asistencia.total_asistidos + asistencia.total_inasistidos }} de {{ asistencia.año }}{{ asistencia.seccion }}">
+        <div class="chart-container">
+            <h3 class="chart-title">Total de Alumnos por Sección</h3>
+            <div class="chart-wrap horizontal">
+                <div class="grid">
+                    {% for asistencia in resumen %}
+                    <div class="bar" 
+                         style="--bar-value:{{ asistencia.total_asistidos + asistencia.total_inasistidos }}%;"
+                         data-name="Total: {{ asistencia.total_asistidos + asistencia.total_inasistidos }} - {{ asistencia.año }}{{ asistencia.seccion }}">
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
-        {% endfor %}
-    </div>
+    </section>
 </div>
-
 
 {% endblock %}
