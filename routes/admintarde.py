@@ -59,14 +59,15 @@ def administracionPM():
                             ROUND(100.0 * COUNT(DISTINCT e.nie) / NULLIF(COUNT(DISTINCT e.nie) + COUNT(CASE WHEN e.nie IS NULL THEN 1 END), 0), 2) AS porcentaje_asistencia,
                             GROUP_CONCAT(CASE WHEN e.nie IS NULL THEN est.codigo END) AS codigos_inasistidos,
                             GROUP_CONCAT(CASE WHEN e.nie IS NOT NULL THEN est.codigo END) AS codigos_asistidos,
-                            MIN(DATE(e.fecha_entrada)) AS fecha_primera_asistencia
+                            MIN(DATE(e.fecha_entrada)) AS fecha_primera_asistencia,
+                            DATE(e.fecha_entrada) AS fecha_entrada
                         FROM estudiantes est
                         LEFT JOIN entrada e ON est.nie = e.nie AND DATE(e.fecha_entrada) BETWEEN %s AND %s
                         JOIN seccion sec ON est.año = sec.año AND est.seccion = sec.seccion
                         WHERE est.genero IN ('M', 'F')
                         AND (e.nie IS NULL OR TIME(e.hora_entrada) BETWEEN '12:45:00' AND '21:00:00')
                         {0}
-                        GROUP BY sec.año, sec.seccion
+                        GROUP BY sec.año, sec.seccion, DATE(e.fecha_entrada)
                         ORDER BY sec.año, sec.seccion
                     """.format("AND CONCAT(sec.año, sec.seccion) LIKE %s" if busqueda else "")
 
@@ -133,8 +134,8 @@ def administracionPM():
 
     # Add the date and day of the week to each record in the summary
     for record in resumen:
-        record['fecha'] = record['fecha_primera_asistencia'].strftime('%Y-%m-%d') if record['fecha_primera_asistencia'] else fecha_inicio.strftime('%Y-%m-%d')
-        record['dia_semana'] = record['fecha_primera_asistencia'].strftime('%A') if record['fecha_primera_asistencia'] else fecha_inicio.strftime('%A')
+        record['fecha'] = record['fecha_entrada'].strftime('%Y-%m-%d') if record['fecha_entrada'] else fecha_inicio.strftime('%Y-%m-%d')
+        record['dia_semana'] = record['fecha_entrada'].strftime('%A') if record['fecha_entrada'] else fecha_inicio.strftime('%A')
 
     return render_template('vespertino.html', resumen=resumen, totales=totales, busqueda=busqueda, 
                          fecha_inicio=fecha_inicio, fecha_fin=fecha_fin, web_name='Vespertino')
