@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="admin-container">
+    <h1 class="page-title">Administración Vespertina</h1>
+
+    <!-- Formulario para buscar detalles de asistencia por sección -->
+    <div class="search-section-details">
+        <h2 class="section-title">Buscar Detalles de Asistencia por Sección</h2>
+        <form class="search-form" method="GET" action="/detalles/seccion">
+            <input type="text" name="anio" placeholder="Año (Ej. 2024)" required>
+            <input type="text" name="seccion" placeholder="Sección (Ej. 1A, 2B)" required autocomplete="off">
+            <button type="submit" class="btn btn-primary">Buscar Detalles</button>
+        </form>
+    </div>
+
+    <!-- Mostrar los detalles de asistencia si los hay -->
+    {% if detalle_asistencia %}
+    <div class="details-section">
+        <h3>Detalles de Asistencia para la Sección {{ seccion }} del Año {{ anio }}</h3>
+        <table class="details-table">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Asistidos</th>
+                    <th>M</th>
+                    <th>F</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for registro in detalle_asistencia %}
+                <tr>
+                    <td>{{ registro.fecha }}</td>
+                    <td>{{ registro.asistidos }}</td>
+                    <td>{{ registro.masculino }}</td>
+                    <td>{{ registro.femenino }}</td>
+                    <td>{{ registro.total }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-message">No se encontraron detalles para la sección solicitada.</div>
+    {% endif %}
+
+    <!-- Mostrar los estudiantes que no asistieron -->
+    {% if estudiantes_no_asistieron %}
+    <div class="absent-students">
+        <h3>Estudiantes que no asistieron</h3>
+        <ul>
+            {% for estudiante in estudiantes_no_asistieron %}
+            <li>{{ estudiante.nombre }} ({{ estudiante.nie }})</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% else %}
+    <div class="empty-message">Todos los estudiantes asistieron.</div>
+    {% endif %}
+</div>
+
+{% endblock %}

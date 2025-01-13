@@ -15,7 +15,6 @@ class Config:
 
 """
 
-
 class Config:
     SECRET_KEY = os.urandom(24)
     DB_CONFIG = {
