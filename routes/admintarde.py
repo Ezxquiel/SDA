@@ -1,3 +1,4 @@
+
 # routes.py
 from flask import Blueprint, request, flash, redirect, url_for, render_template, send_file, session
 from models.database import db_operation, get_db_connection
@@ -62,9 +63,10 @@ def administracionPM():
                             MIN(DATE(e.fecha_entrada)) AS fecha_primera_asistencia,
                             DATE(e.fecha_entrada) AS fecha_entrada
                         FROM estudiantes est
-                        LEFT JOIN entrada e ON est.nie = e.nie AND DATE(e.fecha_entrada) BETWEEN %s AND %s AND TIME(e.hora_entrada) BETWEEN '12:45:00' AND '23:59:00'
+                        LEFT JOIN entrada e ON est.nie = e.nie AND DATE(e.fecha_entrada) BETWEEN %s AND %s
                         JOIN seccion sec ON est.año = sec.año AND est.seccion = sec.seccion
                         WHERE est.genero IN ('M', 'F')
+                        AND (e.nie IS NULL OR TIME(e.hora_entrada) BETWEEN '12:45:00' AND '21:00:00')
                         {0}
                         GROUP BY sec.año, sec.seccion, DATE(e.fecha_entrada)
                         ORDER BY sec.año, sec.seccion
@@ -79,9 +81,10 @@ def administracionPM():
                             COUNT(CASE WHEN e.nie IS NULL THEN 1 END) AS total_inasistidos,
                             ROUND(100.0 * COUNT(DISTINCT e.nie) / NULLIF(COUNT(DISTINCT e.nie) + COUNT(CASE WHEN e.nie IS NULL THEN 1 END), 0), 2) AS porcentaje_asistencia
                         FROM estudiantes est
-                        LEFT JOIN entrada e ON est.nie = e.nie AND DATE(e.fecha_entrada) BETWEEN %s AND %s AND TIME(e.hora_entrada) BETWEEN '12:45:00' AND '23:59:00'
+                        LEFT JOIN entrada e ON est.nie = e.nie AND DATE(e.fecha_entrada) BETWEEN %s AND %s
                         JOIN seccion sec ON est.año = sec.año AND est.seccion = sec.seccion
                         WHERE est.genero IN ('M', 'F')
+                        AND (e.nie IS NULL OR TIME(e.hora_entrada) BETWEEN '12:45:00' AND '21:00:00')
                         {0}
                     """.format("AND CONCAT(sec.año, sec.seccion) LIKE %s" if busqueda else "")
 
