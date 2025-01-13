@@ -57,8 +57,8 @@ def administracionPM():
                             COUNT(DISTINCT CASE WHEN est.genero = 'F' AND e.nie IS NOT NULL THEN e.nie END) AS total_femenino,
                             COUNT(CASE WHEN e.nie IS NULL THEN 1 END) AS total_inasistidos,
                             ROUND(100.0 * COUNT(DISTINCT e.nie) / NULLIF(COUNT(DISTINCT e.nie) + COUNT(CASE WHEN e.nie IS NULL THEN 1 END), 0), 2) AS porcentaje_asistencia,
-                            GROUP_CONCAT(CASE WHEN e.nie IS NULL THEN est.codigo END) AS codigos_inasistidos,
-                            GROUP_CONCAT(CASE WHEN e.nie IS NOT NULL THEN est.codigo END) AS codigos_asistidos,
+                            GROUP_CONCAT(CASE WHEN e.nie IS NULL THEN est.nombre END) AS codigos_inasistidos,
+                            GROUP_CONCAT(CASE WHEN e.nie IS NOT NULL THEN est.nombre END) AS codigos_asistidos,
                             MIN(DATE(e.fecha_entrada)) AS fecha_primera_asistencia,
                             DATE(e.fecha_entrada) AS fecha_entrada
                         FROM estudiantes est

@@ -38,6 +38,11 @@ app.register_blueprint(informe_bp, url_prefix='/informe')
 
 app.register_blueprint(verasitencia_bp)
 
+@app.errorhandler(404)
+def page_not_found(error):
+    # Puedes personalizar el mensaje de error y devolver una plantilla
+    return "No pagina"
+
 
 
 # Función para iniciar el hilo de la tarea de registro automático
