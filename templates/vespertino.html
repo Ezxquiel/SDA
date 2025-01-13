@@ -14,16 +14,6 @@
         <button type="submit" class="btn btn-secondary" name="mostrar_todo" value="1">Ver Todas las Secciones</button>
     </form>
 
-    <!-- Nuevo apartado para buscar detalles por sección -->
-    <div class="search-section-details">
-        <h2 class="section-title">Buscar Detalles de Asistencia por Sección</h2>
-        <form class="search-form" method="GET" action="/detalles/seccion">
-            <input type="text" name="anio" placeholder="Año (Ej. 2024)" required>
-            <input type="text" name="seccion" placeholder="Sección (Ej. 1A, 2B)" required autocomplete="off">
-            <button type="submit" class="btn btn-primary">Buscar Detalles</button>
-        </form>
-    </div>
-
     <!-- Resultados de la búsqueda de detalles de asistencia -->
     {% if detalles %}
     <div class="details-section">
@@ -59,7 +49,7 @@
 
     <!-- Resto del contenido -->
     <div class="records-section">
-        <h2 class="section-title">Resumen</h2>
+        <h2 class="section-title">Resumen de Asistencia por Sección y Día</h2>
         {% if resumen %}
         <table class="records-table">
             <thead>
@@ -77,8 +67,8 @@
             <tbody>
                 {% for asistencia in resumen %}
                 <tr>
-                    <td>{{ asistencia.fecha_entrada }}</td>
-                    <td><a href="#SeccionAll">{{ asistencia.año }} - {{ asistencia.seccion }}</a></td>
+                    <td>{{ asistencia.fecha }}</td> <!-- Solo mostramos la fecha -->
+                    <td>{{ asistencia.seccion }}</td> <!-- Solo mostramos la sección -->
                     <td>{{ asistencia.total_asistidos }}</td>
                     <td>{{ asistencia.total_masculino }}</td>
                     <td>{{ asistencia.total_femenino }}</td>
@@ -90,10 +80,19 @@
             </tbody>
         </table>
         {% else %}
-        <div class="empty-message">No se encontraron Registros</div>
+        <div class="empty-message">No se encontraron registros para la búsqueda.</div>
         {% endif %}
     </div>
 
+</div>
+
+<div class="search-section-details">
+    <h2 class="section-title">Buscar Detalles de Asistencia por Sección</h2>
+    <form class="search-form" method="GET" action="/detalles/seccion">
+        <input type="text" name="anio" placeholder="Año (Ej. 2024)" required>
+        <input type="text" name="seccion" placeholder="Sección (Ej. 1A, 2B)" required autocomplete="off">
+        <button type="submit" class="btn btn-primary">Buscar Detalles</button>
+    </form>
 </div>
 
 {% endblock %}
