@@ -1,58 +1,133 @@
 
+{% extends "layout.html" %}
 {% block content %}
+
     <div class="container mt-5">
         <h1 class="mb-4">Detalles de la Sección {{ anio }} - {{ seccion }}</h1>
 
-        <h2>Estudiantes con Asistencia</h2>
-        {% if alumnos_con_asistencia %}
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>NIE</th>
-                        <th>Nombre</th>
-                        <th>Código</th>
-                        <th>Fecha de Entrada</th>
-                        <th>Hora de Entrada</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for alumno in alumnos_con_asistencia %}
-                    <tr>
-                        <td>{{ alumno.nie }}</td>
-                        <td>{{ alumno.nombre }}</td>
-                        <td>{{ alumno.codigo }}</td>
-                        <td>{{ alumno.fecha_entrada }}</td>
-                        <td>{{ alumno.hora_entrada }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p>No hay estudiantes con asistencia registrada.</p>
-        {% endif %}
 
-        <h2>Estudiantes Sin Asistencia</h2>
-        {% if estudiantes_sin_asistencia %}
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>NIE</th>
-                        <th>Nombre</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for estudiante in estudiantes_sin_asistencia %}
-                    <tr>
-                        <td>{{ estudiante.nie }}</td>
-                        <td>{{ estudiante.nombre }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p>No hay estudiantes sin asistencia hoy.</p>
-        {% endif %}
+<div class="attendance-container">
+    <h1 class="page-title">Detalles de Asistencia - {{ anio }}{{ seccion }}</h1>
+    
+    <div class="info-card">
+        <div class="card-content">
+            <h2 class="card-title">Información del Período</h2>
+            <div class="period-info">
+                <div class="info-item">
+                    <span class="label">Fecha Inicio:</span>
+                    <span class="value">{{ estadisticas.fecha_inicio|string }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Fecha Fin:</span>
+                    <span class="value">{{ estadisticas.fecha_fin|string }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Porcentaje de Asistencia:</span>
+                    <span class="value">{{ estadisticas.porcentaje_asistencia }}%</span>
+                </div>
+            </div>
+        </div>
     </div>
+
+
+    <div class="attendance-grid">
+        <!-- Estudiantes Con Asistencia -->
+        <div class="attendance-card">
+            <div class="card-header success">
+                <h2>Estudiantes Con Asistencia ({{ alumnos_con_asistencia|length }})</h2>
+            </div>
+            <div class="card-content">
+                {% if alumnos_con_asistencia %}
+                <div class="table-container">
+                    <table class="attendance-table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre</th>
+                                <th>Fecha</th>
+                                <th>Hora</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for alumno in alumnos_con_asistencia %}
+                            <tr>
+                                <td>{{ alumno.codigo }}</td>
+                                <td>{{ alumno.nombre }}</td>
+                                <td>{{ alumno.fecha_entrada|string }}</td>
+                                <td>{{ alumno.hora_entrada|string }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="empty-message">No hay estudiantes registrados con asistencia</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Estudiantes Sin Asistencia -->
+        <div class="attendance-card">
+            <div class="card-header error">
+                <h2>Estudiantes Sin Asistencia ({{ alumnos_sin_asistencia|length }})</h2>
+            </div>
+            <div class="card-content">
+                {% if alumnos_sin_asistencia %}
+                <div class="table-container">
+                    <table class="attendance-table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for alumno in alumnos_sin_asistencia %}
+                            <tr>
+                                <td>{{ alumno.codigo }}</td>
+                                <td>{{ alumno.nombre }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="empty-message">No hay estudiantes registrados sin asistencia</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="summary-card">
+        <div class="card-header primary">
+            <h2>Resumen de Asistencia</h2>
+        </div>
+        <div class="card-content">
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <h3>Total de Estudiantes</h3>
+                    <span class="number">{{ estadisticas.total_estudiantes }}</span>
+                </div>
+                <div class="summary-item">
+                    <h3>Total Asistidos</h3>
+                    <span class="number">{{ estadisticas.total_asistidos }}</span>
+                </div>
+                <div class="summary-item">
+                    <h3>Total Inasistidos</h3>
+                    <span class="number">{{ estadisticas.total_inasistidos }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="actions">
+        <a href="{{ url_for('admintarde.administracionPM') }}" class="btn-back">
+            Volver a la Vista General
+        </a>
+    </div>
+</div>
+
+
 
    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
