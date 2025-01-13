@@ -11,6 +11,7 @@ from routes.admin_mañana import admin_mañana_bp
 from routes.registro_automatico import llamar_registro_automatico
 from routes.login import login_bp , inicio_bp
 from routes.informe import informe_bp
+from routes.informeAM import informeAM_bp
 from routes.inicio import index_bp
 import threading
 import os
@@ -35,6 +36,7 @@ app.register_blueprint(index_bp)
 
 
 app.register_blueprint(informe_bp, url_prefix='/informe')
+app.register_blueprint(informeAM_bp, url_prefix='/informeAM')
 
 app.register_blueprint(verasitencia_bp)
 

@@ -8,7 +8,7 @@
     <form class="search-form" method="POST" action="/admintardePM">
         <input type="text" name="busqueda" placeholder="Buscar Por Sección...." autocomplete="off" autofocus>
         <input type="date" name="fecha_inicio" placeholder="Fecha Inicio">
-        <input type="date" name="fecha_fin" placeholder="Fecha fin">
+        <input type="date" name="fecha_fin" placeholder="Fecha fin" >
         <button type="submit" name="descargar_pdf" value="1" class="btn btn-primary">Descargar PDF</button>
         <button type="submit" class="btn-search">Buscar</button>
         <button type="submit" class="btn btn-secondary" name="mostrar_todo" value="1">Ver Todas las Secciones</button>
@@ -27,14 +27,23 @@
                     <th>F</th>
                     <th>Inasistidos</th>
                     <th>Total</th>
-                    <th>Nombres de Inasistidos</th>
+                    <th>codigo inasistidos</th>
                 </tr>
             </thead>
             <tbody>
                 {% for asistencia in resumen %}
                 <tr>
                     <td>{{ asistencia.fecha_entrada }}</td>
-                    <td><a href="#SeccionAll">{{ asistencia.año }} - {{ asistencia.seccion }}</a></td>
+                    <td>
+                        <a href="{{ url_for('informeAM.ruta_detalles_seccion', 
+                                            anio=asistencia.año, 
+                                            seccion=asistencia.seccion,
+                                            fecha_inicio=fecha_inicio|string,
+                                            fecha_fin=fecha_fin|string) }}"
+                           class="section-link">
+                            {{ asistencia.año }} - {{ asistencia.seccion }}
+                        </a>
+                    </td>
                     <td>{{ asistencia.total_asistidos }}</td>
                     <td>{{ asistencia.total_masculino }}</td>
                     <td>{{ asistencia.total_femenino }}</td>
