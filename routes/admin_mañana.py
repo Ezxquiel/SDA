@@ -5,15 +5,12 @@ from datetime import datetime, date
 from utils.pdf_generator import AttendanceReport
 from utils.auth_utils import login_required, admin_required
 
-
 admin_mañana_bp = Blueprint('admin_mañana', __name__)
 
 @admin_mañana_bp.route('/administracionAM', methods=['GET', 'POST'])
 @login_required
 @admin_required
-
 def administracionM():
-
     if 'user_id' not in session:
         flash("Debes iniciar sesión para acceder", "warning")
         return redirect('/login')
@@ -54,6 +51,8 @@ def administracionM():
                     # Consulta principal con filtro de búsqueda
                     consulta_detalle = """
                         SELECT
+                            DATE(e.fecha_entrada) AS fecha,
+                            DAYNAME(e.fecha_entrada) AS dia_semana,
                             sec.año,
                             sec.seccion,
                             COUNT(DISTINCT e.nie) AS total_asistidos,
@@ -68,6 +67,7 @@ def administracionM():
                         JOIN seccion sec ON est.año = sec.año AND est.seccion = sec.seccion
                         WHERE est.genero IN ('M', 'F')
                         {0}
+<<<<<<< HEAD
                         GROUP BY sec.año, sec.seccion
                         ORDER BY sec.año, sec.seccion
                     """.format("AND CONCAT(sec.año, sec.seccion) LIKE %s" if busqueda else "")
@@ -85,25 +85,24 @@ def administracionM():
                         JOIN seccion sec ON est.año = sec.año AND est.seccion = sec.seccion
                         WHERE est.genero IN ('M', 'F')
                         {0}
+=======
+                        GROUP BY DATE(e.fecha_entrada), sec.año, sec.seccion
+                        ORDER BY DATE(e.fecha_entrada), sec.año, sec.seccion
+>>>>>>> 85c14dadbae30ff07ce1b4efe8938e76ff66bf93
                     """.format("AND CONCAT(sec.año, sec.seccion) LIKE %s" if busqueda else "")
 
                     # Preparar parámetros
                     params_detalle = [fecha_inicio, fecha_fin]
-                    params_totales = [fecha_inicio, fecha_fin]
                     
                     if busqueda:
                         params_detalle.append(f'%{busqueda}%')
-                        params_totales.append(f'%{busqueda}%')
 
                     # Ejecutar consultas
                     cursor.execute(consulta_detalle, tuple(params_detalle))
                     resumen = cursor.fetchall()
-                    
-                    cursor.execute(consulta_totales, tuple(params_totales))
-                    totales = cursor.fetchone()
 
                     # Verificar si se debe generar PDF
-                    if descargar_pdf and resumen and totales:
+                    if descargar_pdf and resumen:
                         try:
                             report = AttendanceReport(resumen, totales, fecha_inicio, fecha_fin)
                             pdf_filename = report.generate()

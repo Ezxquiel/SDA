@@ -13,12 +13,13 @@ def administracion():
         if not conn:
             flash("No se pudo conectar a la base de datos.", "danger")
             return render_template('administracion.html', asistencias_hoy=[], salidas_hoy=[], 
-                                conteo_genero=[], resumen=[], busqueda='', fecha_inicio='', fecha_fin='')
+                                conteo_genero=[], resumen=[], datos_mostrar=[], busqueda='', fecha_inicio='', fecha_fin='')
 
         asistencias_hoy = []
         salidas_hoy = []
         conteo_genero = [] 
         resumen = []
+        datos_mostrar = []
         busqueda = ''
         fecha_inicio = ''
         fecha_fin = ''
@@ -34,7 +35,6 @@ def administracion():
                 fecha_inicio = datetime.strptime(fecha_inicio, '%Y-%m-%d').date() if fecha_inicio else fecha_actual
                 fecha_fin = datetime.strptime(fecha_fin, '%Y-%m-%d').date() if fecha_fin else fecha_actual
 
-
                 if fecha_fin < fecha_inicio:
                     flash("La fecha final no puede ser menor que la fecha inicial.", "warning")
                     fecha_fin = fecha_inicio
@@ -47,8 +47,7 @@ def administracion():
             try:
                 with conn.cursor() as cursor:
 
-
-                #Consulta para obtener las entradas , con JOIN
+                    # Consulta para obtener las entradas , con JOIN
                     query_entradas = """
                         SELECT 
                             e.nombre,
@@ -69,8 +68,7 @@ def administracion():
                                   fecha_inicio, fecha_fin))
                     asistencias_hoy = cursor.fetchall()
 
-
-                    #consulta para obtener las salidas , combinando las tablas con JOIN
+                    # Consulta para obtener las salidas , combinando las tablas con JOIN
                     query_salidas = """
                         SELECT 
                             e.nombre,
@@ -91,8 +89,7 @@ def administracion():
                                   fecha_inicio, fecha_fin))
                     salidas_hoy = cursor.fetchall()
 
-                    #consulta para el conteo de genero
-
+                    # Consulta para el conteo de genero
                     query_count_genero = """
                         SELECT 
                             UPPER(e.genero) AS genero_normalizado,
@@ -110,8 +107,7 @@ def administracion():
                     if not asistencias_hoy and not salidas_hoy and busqueda:
                         flash("No se encontraron registros para la búsqueda especificada.", "info")
 
-
-                #consulta para el resumen 
+                    # Consulta para el resumen 
                     consulta = """
                         SELECT 
                             sec.año, 
@@ -126,10 +122,11 @@ def administracion():
                         JOIN seccion sec ON est.año = sec.año AND est.seccion = sec.seccion
                         GROUP BY sec.año, sec.seccion
                     """
-
                     cursor.execute(consulta, (fecha_inicio, fecha_fin))
                     resumen = cursor.fetchall()
 
+                    # Preparar datos para mostrar en el HTML
+                    datos_mostrar = resumen
 
             except Exception as e:
                 print(f"Error en la consulta: {str(e)}")
@@ -139,11 +136,12 @@ def administracion():
                                     salidas_hoy=[],
                                     conteo_genero=[],
                                     resumen=[],
+                                    datos_mostrar=[],
                                     busqueda=busqueda,
                                     fecha_inicio=fecha_inicio,
                                     fecha_fin=fecha_fin)
 
-            #para descargar el pdf
+            # Para descargar el PDF
             if descargar_pdf:
                 try:
                     report = AttendanceReport(asistencias_hoy, salidas_hoy)
@@ -160,6 +158,7 @@ def administracion():
                              salidas_hoy=[],
                              conteo_genero=[],
                              resumen=[],
+                             datos_mostrar=[],
                              busqueda='',
                              fecha_inicio='',
                              fecha_fin='')
@@ -168,13 +167,13 @@ def administracion():
         if conn:
             conn.close()
 
-    #envia los datos al template
+    # Enviar los datos al template
     return render_template('administracion.html',
                          asistencias_hoy=asistencias_hoy,
                          salidas_hoy=salidas_hoy,
                          conteo_genero=conteo_genero,  
-                         resumen = resumen,
+                         resumen=resumen,
+                         datos_mostrar=datos_mostrar,
                          busqueda=busqueda,
                          fecha_inicio=fecha_inicio,
                          fecha_fin=fecha_fin, web_name='Administración')
-

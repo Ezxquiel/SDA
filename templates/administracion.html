@@ -4,10 +4,10 @@
 <div class="admin-container">
     <h1 class="page-title">Administración de Asistencia y Salida</h1>
 
-    <form class="search-form" method="POST" action="/administracion">
-        <input type="text" name="busqueda" placeholder="Buscar por NIE o código..." required autocomplete="off" autofocus>
-        <input type="date" name="fecha_inicio" placeholder="Fecha de inicio">
-        <input type="date" name="fecha_fin" placeholder="Fecha de fin">
+    <form class="search-form" method="POST" action="{{ url_for('admin_mañana.administracionM') }}">
+        <input type="text" name="busqueda" placeholder="Buscar por NIE o código..." required autocomplete="off" autofocus value="{{ busqueda }}">
+        <input type="date" name="fecha_inicio" placeholder="Fecha de inicio" value="{{ fecha_inicio }}">
+        <input type="date" name="fecha_fin" placeholder="Fecha de fin" value="{{ fecha_fin }}">
         <button type="submit" name="descargar_pdf" value="true" class="btn-download">
             Descargar PDF
         </button>
@@ -16,114 +16,46 @@
         </button>
     </form>
 
-
     <div class="records-section">
         <h2 class="section-title">RESUMEN</h2>
         {% if resumen %}
         <table class="records-table">
             <thead>
                 <tr>
+                    <th>Fecha</th>
+                    <th>Día</th>
+                    <th>Año</th>
                     <th>Sección</th>
                     <th>Asistidos</th>
                     <th>M</th>
                     <th>F</th>
                     <th>Inasistidos</th>
-                    <th>Total</th>
-                    <th>Código de los inasistidos</th>
+                    <th>% Asistencia</th>
+                    <th>Códigos Asistidos</th>
                 </tr>
             </thead>
             <tbody>
                 {% for asistencia in resumen %}
                 <tr>
-                    <td>{{ asistencia.año }} - {{ asistencia.seccion }}</td>
+                    <td>{{ asistencia.fecha }}</td>
+                    <td>{{ asistencia.dia_semana }}</td>
+                    <td>{{ asistencia.año }}</td>
+                    <td>{{ asistencia.seccion }}</td>
                     <td>{{ asistencia.total_asistidos }}</td>
                     <td>{{ asistencia.total_masculino }}</td>
                     <td>{{ asistencia.total_femenino }}</td>
                     <td>{{ asistencia.total_inasistidos or 0 }}</td>
-                    <td>{{ asistencia.total or (asistencia.total_asistidos + asistencia.total_inasistidos) }}</td>
+                    <td>{{ asistencia.porcentaje_asistencia }}%</td>
+                    <td>{{ asistencia.codigos_asistidos or 'N/A' }}</td>
+                    <td>{{ asistencia.codigos_inasistidos or 'N/A' }}</td>
                     <td>{{ asistencia.codigos_inasistidos or 'N/A' }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
         {% else %}
-        <div class="empty-message">No se encontraron Registro</div>
+        <div class="empty-message">No se encontraron registros.</div>
         {% endif %}
     </div>
-
-    <div class="records-section">
-        <h3>Total de Asistencias</h3>
-        <ul>
-            {% for conteo in conteo_genero %}
-            <li>{{ conteo.genero_normalizado }}: {{ conteo.total }}</li>
-            {% endfor %}
-        </ul>
-    </div>
-    
-
-    <div class="records-section">
-        <h2 class="section-title">Registro de Entradas</h2>
-        {% if asistencias_hoy %}
-        <table class="records-table">
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Código</th>
-                    <th>Género</th>
-                    <th>NIE</th>
-                    <th>Fecha</th>
-                    <th>Hora</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for asistencia in asistencias_hoy %}
-                <tr>
-                    <td>{{ asistencia.nombre }}</td>
-                    <td>{{ asistencia.codigo }}</td>
-                    <td>{{ asistencia.genero }}</td>
-                    <td>{{ asistencia.nie }}</td>
-                    <td>{{ asistencia.fecha }}</td>
-                    <td>{{ asistencia.hora }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <div class="empty-message">No se encontraron registros de entrada.</div>
-        {% endif %}
-    </div>
-
-    <div class="records-section">
-        <h2 class="section-title">Registro de Salidas</h2>
-        {% if salidas_hoy %}
-        <table class="records-table">
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Código</th>
-                    <th>Género</th>
-                    <th>NIE</th>
-                    <th>Fecha</th>
-                    <th>Hora</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for salida in salidas_hoy %}
-                <tr>
-                    <td>{{ salida.nombre }}</td>
-                    <td>{{ salida.codigo }}</td>
-                    <td>{{ salida.genero }}</td>
-                    <td>{{ salida.nie }}</td>
-                    <td>{{ salida.fecha }}</td>
-                    <td>{{ salida.hora }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <div class="empty-message">No se encontraron registros de salida.</div>
-        {% endif %}
-    </div>
- 
 </div>
 {% endblock %}
