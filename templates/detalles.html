@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="details-container">
+    <h1>Detalles de la Sección {{ anio }} - {{ seccion }}</h1>
+
+    {% if detalle_asistencia %}
+    <table>
+        <thead>
+            <tr>
+                <th>NIE</th>
+                <th>Nombre</th>
+                <th>Género</th>
+                <th>Fecha Entrada</th>
+                <th>Hora Entrada</th>
+                <th>Hora Salida</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for estudiante in detalle_asistencia %}
+            <tr>
+                <td>{{ estudiante.nie }}</td>
+                <td>{{ estudiante.nombre }}</td>
+                <td>{{ estudiante.genero }}</td>
+                <td>{{ estudiante.fecha_entrada }}</td>
+                <td>{{ estudiante.hora_entrada }}</td>
+                <td>{{ estudiante.hora_salida }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No hay asistencia registrada para esta sección.</p>
+    {% endif %}
+</div>
+{% endblock %}

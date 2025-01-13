@@ -140,3 +140,43 @@ def administracionPM():
 
     return render_template('vespertino.html', resumen=resumen, totales=totales, busqueda=busqueda, 
                          fecha_inicio=fecha_inicio, fecha_fin=fecha_fin, web_name='Vespertino')
+
+
+@admintarde_bp.route('/detalles/seccion/<int:anio>/<string:seccion>', methods=['GET'])
+def detalle_seccion(anio, seccion):
+    if 'user_id' not in session:
+        flash("Debes iniciar sesión para acceder", "warning")
+        return redirect('/login')
+    
+    try:
+        conn = get_db_connection()
+        if not conn:
+            flash("No se pudo conectar a la base de datos.", "danger")
+            return redirect('/admintardePM')
+
+        detalle_asistencia = []
+        try:
+            with conn.cursor() as cursor:
+                consulta_detalle = """
+                    SELECT
+                        est.nie,
+                        est.nombre,
+                        est.genero,
+                        DATE(e.fecha_entrada) AS fecha_entrada,
+                        TIME(e.hora_entrada) AS hora_entrada,
+                        TIME(e.hora_salida) AS hora_salida
+                    FROM estudiantes est
+                    LEFT JOIN entrada e ON est.nie = e.nie
+                    WHERE est.año = %s AND est.seccion = %s
+                    ORDER BY est.nombre
+                """
+                cursor.execute(consulta_detalle, (anio, seccion))
+                detalle_asistencia = cursor.fetchall()
+        except Exception as e:
+            print(f"Error en la consulta: {str(e)}")
+            flash("Error al obtener detalles de la sección.", "danger")
+    finally:
+        if conn:
+            conn.close()
+
+    return render_template('detalles.html', detalle_asistencia=detalle_asistencia, anio=anio, seccion=seccion)
