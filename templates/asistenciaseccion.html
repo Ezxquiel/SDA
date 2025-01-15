@@ -1,0 +1,52 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <h1>Consultar Asistencias</h1>
+    <form method="POST" action="{{ url_for('asistencias.consultar_asistencias') }}">
+        <label for="año">Año:</label>
+        <select id="año" name="año">
+            <option value="" selected>Seleccione un año</option>
+            {% for a in años %}
+                <option value="{{ a }}" {% if a == año %}selected{% endif %}>{{ a }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="seccion">Sección:</label>
+        <select id="seccion" name="seccion">
+            <option value="" selected>Seleccione una sección</option>
+            {% for s in secciones %}
+                <option value="{{ s }}" {% if s == seccion %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="fecha_inicio">Fecha Inicio:</label>
+        <input type="date" id="fecha_inicio" name="fecha_inicio" value="{{ fecha_inicio }}">
+
+        <label for="fecha_fin">Fecha Fin:</label>
+        <input type="date" id="fecha_fin" name="fecha_fin" value="{{ fecha_fin }}">
+
+        <button type="submit">Buscar</button>
+    </form>
+
+    <h2>Asistencias de la Sección {{ seccion }}:</h2>
+    {% if asistencias_hoy[seccion] %}
+        <ul>
+            {% for asistencia in asistencias_hoy[seccion] %}
+                <li>{{ asistencia.nombre }} ({{ asistencia.codigo }}) - {{ asistencia.fecha }} - {{ asistencia.hora }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No se encontraron asistencias para esta sección.</p>
+    {% endif %}
+
+    <h2>Salidas de la Sección {{ seccion }}:</h2>
+    {% if salidas_hoy[seccion] %}
+        <ul>
+            {% for salida in salidas_hoy[seccion] %}
+                <li>{{ salida.nombre }} ({{ salida.codigo }}) - {{ salida.fecha }} - {{ salida.hora }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No se encontraron salidas para esta sección.</p>
+    {% endif %}
+{% endblock %}
