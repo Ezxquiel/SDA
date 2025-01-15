@@ -13,6 +13,7 @@ from routes.login import login_bp , inicio_bp
 from routes.informe import informe_bp
 from routes.informeAM import informeAM_bp
 from routes.inicio import index_bp
+from routes.asistencias import asistencias_bp
 import threading
 import os
 
@@ -33,6 +34,8 @@ app.register_blueprint(admin_mañana_bp)
 app.register_blueprint(login_bp)
 app.register_blueprint(inicio_bp)
 app.register_blueprint(index_bp)
+app.register_blueprint(asistencias_bp)
+
 
 
 app.register_blueprint(informe_bp, url_prefix='/informe')
