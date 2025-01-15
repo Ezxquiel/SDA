@@ -1,0 +1,68 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="container">
+    <form class="attendance-form" method="POST" action="{{ url_for('aula.gestionar_aula') }}">
+        <div class="form-group">
+            <label class="form-label" for="año">Año:</label>
+            <select class="form-select" name="año" id="año">
+                {% for año in años %}
+                    <option value="{{ año['año'] }}">{{ año['año'] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="seccion">Sección:</label>
+            <select class="form-select" name="seccion" id="seccion">
+                {% for seccion in secciones %}
+                    <option value="{{ seccion['seccion'] }}">{{ seccion['seccion'] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button class="btn btn-search" type="submit" name="buscar">Buscar Estudiantes</button>
+    </form>
+
+    {% if estudiantes is defined %}
+    <h2 class="form-header">Estudiantes de {{ año }} - Sección {{ seccion }}</h2>
+    
+    <form class="attendance-form" method="POST" action="{{ url_for('aula.gestionar_aula') }}">
+        <div class="form-group">
+            <label class="form-label" for="materia">Materia:</label>
+            <select class="form-select" name="materia" id="materia">
+                <option value="Ciencias">Ciencias</option>
+                <option value="Matematicas">Matematicas</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="maestro">Maestro:</label>
+            <input class="form-input" type="text" name="maestro" required>
+        </div>
+        
+        <table class="students-table">
+            <tr>
+                <th>Nombre</th>
+                <th>Código</th>
+                <th>Estado</th>
+            </tr>
+            {% for estudiante in estudiantes %}
+            <tr>
+                <td>{{ estudiante['nombre'] }}</td>
+                <td>{{ estudiante['codigo'] }}</td>
+                <td>
+                    <input type="hidden" name="id_estudiante[]" value="{{ estudiante['id_estudiante'] }}">
+                    <select class="status-select" name="estado[]" required>
+                        <option value="Presente">Presente</option>
+                        <option value="Ausente">Ausente</option>
+                        <option value="Justificado">Justificado</option>
+                    </select>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        <button class="btn btn-submit" type="submit" name="registrar">Registrar Asistencia</button>
+    </form>
+    {% endif %}
+</div>
+
+{% endblock %}
