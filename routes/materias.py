@@ -5,7 +5,9 @@ asistencias_class_bp = Blueprint('asistencias_class', __name__)
 
 @asistencias_class_bp.route('/asistencia_por_materia', methods=['GET', 'POST'])
 def asistencia_por_materia():
-    selected_materia = request.form.get('materia')  # Materia seleccionada en el formulario
+    selected_materia = request.form.get('materia')  # Materia seleccionada
+    selected_año = request.form.get('año')          # Año seleccionado
+    selected_seccion = request.form.get('seccion')  # Sección seleccionada
 
     # Conexión a la base de datos
     conn = get_db_connection()
@@ -15,62 +17,55 @@ def asistencia_por_materia():
     cursor.execute("SELECT id_materia, materia FROM materias")
     materias = cursor.fetchall()
 
+    # Obtener los años y secciones para los filtros
+    cursor.execute("SELECT DISTINCT año FROM seccion")
+    años = cursor.fetchall()
+
+    cursor.execute("SELECT DISTINCT seccion FROM seccion")
+    secciones = cursor.fetchall()
+
+    # Construir la consulta dinámica
+    query = """
+        SELECT
+            am.id_asistencia_materia,
+            am.id_estudiante,
+            e.nombre AS estudiante,
+            m.materia,
+            am.fecha_clase,
+            am.hora_clase,
+            am.maestro,
+            am.estado,
+            j.tipo AS justificacion,
+            s.año,
+            s.seccion
+        FROM
+            asistencia_materia am
+        JOIN
+            estudiantes e ON am.id_estudiante = e.id_estudiante
+        JOIN
+            materias m ON am.materia = m.id_materia
+        LEFT JOIN
+            justificaciones j ON am.id_justificacion = j.id_justificacion
+        JOIN
+            seccion s ON e.año = s.año AND e.seccion = s.seccion
+        WHERE 1 = 1
+    """
+    params = []
+
     if selected_materia:
-        # Obtener las asistencias de la materia seleccionada
-        cursor.execute("""
-            SELECT
-                am.id_asistencia_materia,
-                am.id_estudiante,
-                e.nombre AS estudiante,
-                m.materia,
-                am.fecha_clase,
-                am.hora_clase,
-                am.maestro,
-                am.estado,
-                j.tipo AS justificacion,
-                s.año,  -- Año de la sección
-                s.seccion -- Sección del estudiante
-            FROM
-                asistencia_materia am
-            JOIN
-                estudiantes e ON am.id_estudiante = e.id_estudiante
-            JOIN
-                materias m ON am.materia = m.id_materia
-            LEFT JOIN
-                justificaciones j ON am.id_justificacion = j.id_justificacion
-            JOIN
-                seccion s ON e.año = s.año AND e.seccion = s.seccion  -- Unir con la tabla de secciones
-            WHERE
-                am.materia = %s
-        """, (selected_materia,))
-        asistencias = cursor.fetchall()
-    else:
-        # Obtener todas las asistencias si no se seleccionó una materia
-        cursor.execute("""
-            SELECT
-                am.id_asistencia_materia,
-                am.id_estudiante,
-                e.nombre AS estudiante,
-                m.materia,
-                am.fecha_clase,
-                am.hora_clase,
-                am.maestro,
-                am.estado,
-                j.tipo AS justificacion,
-                s.año,  -- Año de la sección
-                s.seccion -- Sección del estudiante
-            FROM
-                asistencia_materia am
-            JOIN
-                estudiantes e ON am.id_estudiante = e.id_estudiante
-            JOIN
-                materias m ON am.materia = m.id_materia
-            LEFT JOIN
-                justificaciones j ON am.id_justificacion = j.id_justificacion
-            JOIN
-                seccion s ON e.año = s.año AND e.seccion = s.seccion  -- Unir con la tabla de secciones
-        """)
-        asistencias = cursor.fetchall()
+        query += " AND am.materia = %s"
+        params.append(selected_materia)
+
+    if selected_año:
+        query += " AND s.año = %s"
+        params.append(selected_año)
+
+    if selected_seccion:
+        query += " AND s.seccion = %s"
+        params.append(selected_seccion)
+
+    cursor.execute(query, params)
+    asistencias = cursor.fetchall()
 
     cursor.close()
     conn.close()
@@ -78,6 +73,10 @@ def asistencia_por_materia():
     return render_template(
         'asistencia_por_materia.html',
         materias=materias,
+        años=años,
+        secciones=secciones,
         asistencias=asistencias,
-        selected_materia=selected_materia
+        selected_materia=selected_materia,
+        selected_año=selected_año,
+        selected_seccion=selected_seccion
     )

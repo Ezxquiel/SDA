@@ -1,61 +1,86 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-    <div class="container mt-5">
-        <h1 class="text-center">Asistencias por Materia</h1>
+<div class="container mt-5">
+    <h1 class="text-center">Asistencias por Materia</h1>
 
-        <form method="POST" action="{{ url_for('asistencias_class.asistencia_por_materia') }}">
-            <div class="row">
-                <div class="col-md-4">
-                    <label for="materia" class="form-label">Materia:</label>
-                    <select id="materia" name="materia" class="form-control">
-                        <option value="">Seleccione una materia</option>
-                        {% for materia in materias %}
-                            <option value="{{ materia.id_materia }}" {% if materia.id_materia == selected_materia %}selected{% endif %}>
-                                {{ materia.materia }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-4 text-center">
-                    <button type="submit" class="btn btn-primary mt-4">Consultar</button>
-                </div>
-            </div>
-        </form>
-
-        {% if asistencias %}
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Estudiante</th>
-                        <th>Materia</th>
-                        <th>Año</th> <!-- Año de la sección -->
-                        <th>Sección</th> <!-- Nueva columna para la sección -->
-                        <th>Fecha</th>
-                        <th>Hora</th>
-                        <th>Maestro</th>
-                        <th>Estado</th>
-                        <th>Justificación</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for asistencia in asistencias %}
-                        <tr>
-                            <td>{{ asistencia.estudiante }}</td>
-                            <td>{{ asistencia.materia }}</td>
-                            <td>{{ asistencia.año }}</td> <!-- Mostrar el año -->
-                            <td>{{ asistencia.seccion }}</td> <!-- Mostrar la sección -->
-                            <td>{{ asistencia.fecha_clase }}</td>
-                            <td>{{ asistencia.hora_clase }}</td>
-                            <td>{{ asistencia.maestro }}</td>
-                            <td>{{ asistencia.estado }}</td>
-                            <td>{{ asistencia.justificacion or 'N/A' }}</td>
-                        </tr>
+    <form method="POST" action="{{ url_for('asistencias_class.asistencia_por_materia') }}">
+        <div class="row">
+            <div class="col-md-3">
+                <label for="materia" class="form-label">Materia:</label>
+                <select id="materia" name="materia" class="form-control">
+                    <option value="">Seleccione una materia</option>
+                    {% for materia in materias %}
+                        <option value="{{ materia.id_materia }}" {% if materia.id_materia == selected_materia %}selected{% endif %}>
+                            {{ materia.materia }}
+                        </option>
                     {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p class="text-center text-muted">No hay registros de asistencia para la materia seleccionada.</p>
-        {% endif %}
-    </div>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label for="año" class="form-label">Año:</label>
+                <select id="año" name="año" class="form-control">
+                    <option value="">Seleccione un año</option>
+                    {% for año in años %}
+                        <option value="{{ año.año }}" {% if año.año == selected_año %}selected{% endif %}>
+                            {{ año.año }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label for="seccion" class="form-label">Sección:</label>
+                <select id="seccion" name="seccion" class="form-control">
+                    <option value="">Seleccione una sección</option>
+                    {% for seccion in secciones %}
+                        <option value="{{ seccion.seccion }}" {% if seccion.seccion == selected_seccion %}selected{% endif %}>
+                            {{ seccion.seccion }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-3 text-center">
+                <button type="submit" class="btn btn-primary mt-4">Consultar</button>
+            </div>
+        </div>
+    </form>
+
+    {% if asistencias %}
+        <table class="table table-bordered mt-4">
+            <thead>
+                <tr>
+                    <th>Estudiante</th>
+                    <th>Materia</th>
+                    <th>Año</th>
+                    <th>Sección</th>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Maestro</th>
+                    <th>Estado</th>
+                    <th>Justificación</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for asistencia in asistencias %}
+                    <tr>
+                        <td>{{ asistencia.estudiante }}</td>
+                        <td>{{ asistencia.materia }}</td>
+                        <td>{{ asistencia.año }}</td>
+                        <td>{{ asistencia.seccion }}</td>
+                        <td>{{ asistencia.fecha_clase }}</td>
+                        <td>{{ asistencia.hora_clase }}</td>
+                        <td>{{ asistencia.maestro }}</td>
+                        <td>{{ asistencia.estado }}</td>
+                        <td>{{ asistencia.justificacion or 'N/A' }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="text-center text-muted mt-4">No hay registros de asistencia que coincidan con los filtros seleccionados.</p>
+    {% endif %}
+</div>
 {% endblock %}
