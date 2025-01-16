@@ -8,7 +8,7 @@
             <div class="row">
                 <div class="col-md-4">
                     <label for="materia" class="form-label">Materia:</label>
-                    <select id="materia" name="materia" class="form-control" required>
+                    <select id="materia" name="materia" class="form-control">
                         <option value="">Seleccione una materia</option>
                         {% for materia in materias %}
                             <option value="{{ materia.id_materia }}" {% if materia.id_materia == selected_materia %}selected{% endif %}>
@@ -28,6 +28,9 @@
                 <thead>
                     <tr>
                         <th>Estudiante</th>
+                        <th>Materia</th>
+                        <th>Año</th> <!-- Año de la sección -->
+                        <th>Sección</th> <!-- Nueva columna para la sección -->
                         <th>Fecha</th>
                         <th>Hora</th>
                         <th>Maestro</th>
@@ -39,6 +42,9 @@
                     {% for asistencia in asistencias %}
                         <tr>
                             <td>{{ asistencia.estudiante }}</td>
+                            <td>{{ asistencia.materia }}</td>
+                            <td>{{ asistencia.año }}</td> <!-- Mostrar el año -->
+                            <td>{{ asistencia.seccion }}</td> <!-- Mostrar la sección -->
                             <td>{{ asistencia.fecha_clase }}</td>
                             <td>{{ asistencia.hora_clase }}</td>
                             <td>{{ asistencia.maestro }}</td>
