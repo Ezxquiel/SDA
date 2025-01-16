@@ -18,6 +18,9 @@
                        placeholder="Buscar Por Sección...." 
                        autocomplete="off" 
                        autofocus>
+                       <button type="submit" class="btn btn-search">
+                        <i class="fas fa-search"></i> Buscar
+                    </button>
             </div>
             <div class="form-group date-range">
                 <label for="fecha_inicio">Fecha Inicio</label>
@@ -28,9 +31,6 @@
             <div class="form-actions">
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#downloadModal">
                     <i class="fas fa-download"></i> Descargar Reporte
-                </button>
-                <button type="submit" class="btn btn-search">
-                    <i class="fas fa-search"></i> Buscar
                 </button>
                 <button type="submit" class="btn btn-secondary" name="mostrar_todo" value="1">
                     <i class="fas fa-list"></i> Ver Todas las Secciones
@@ -168,7 +168,6 @@
                     <h5 class="modal-title" id="downloadModalLabel">
                         <i class="fas fa-download me-2"></i>Descargar Reporte
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <p class="text-center mb-4">Seleccione el formato de descarga:</p>

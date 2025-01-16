@@ -19,6 +19,10 @@
     --card-shadow: 0 10px 30px -5px rgba(26, 95, 122, 0.15);
 }
 
+body{
+    overflow: hidden;
+}
+
 /* Header Styles */
 .index-header {
     position: fixed;

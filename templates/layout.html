@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="{{url_for('static', filename='img/LogoInaSinFondo.png')}}" type="image/x-icon">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css')}}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css')}}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css')}}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/asistencia.css')}}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css')}}">
@@ -30,8 +29,13 @@
                     <li><a href="/index">Inicio</a></li>
 
                     {% if session.get('user_rango') == 'coordinador' %}
-                    <li><a href="/estudiantes">Registro de alumno</a></li>
-                    <li><a href="/secciones">Sección</a></li>
+                    <li class="drop">
+                        <a href="" class="main-menu">Registros</a>
+                        <ul class="sub">
+                            <li><a href="/estudiantes">Registro de alumno</a></li>
+                            <li><a href="/secciones">Registro de Sección</a></li>
+                        </ul>
+                    </li>
                     <li class="drop">
                         <a href="" class="main-menu">Administración</a>
                         <ul class="sub">
@@ -39,8 +43,13 @@
                             <li><a href="/admintardePM">Turno Vespertino</a></li>
                         </ul>
                     </li>
-                    <li><a href="/verasistencia">Buscar alumno</a></li>
-                    <li><a href="/asistencia_por_materia">materias asistencia</a></li>
+                    <li class="drop">
+                        <a href="" class="main-menu">Asistencias Búsqueda</a>
+                        <ul class="sub">
+                            <li><a href="/verasistencia">Buscar alumno</a></li>
+                            <li><a href="/asistencia_por_materia">materias asistencia</a></li>
+                        </ul>
+                    </li>
                     {% endif %}
 
                     <li class="drop">
