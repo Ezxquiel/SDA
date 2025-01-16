@@ -49,7 +49,10 @@ app.register_blueprint(informeAM_bp, url_prefix='/informeAM')
 
 app.register_blueprint(verasitencia_bp)
 
-
+@app.errorhandler(404)
+def page_not_found(error):
+    # Puedes personalizar el mensaje de error y devolver una plantilla
+    return render_template("error404.html")
 
 
 
