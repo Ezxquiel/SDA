@@ -11,9 +11,15 @@ def asistencia_por_materia():
     selected_seccion = request.form.get('seccion')  # Sección seleccionada
     selected_fecha = request.form.get('fecha')      # Fecha seleccionada
 
+    print(f"Selected Materia: {selected_materia}")
+    print(f"Selected Año: {selected_año}")
+    print(f"Selected Seccion: {selected_seccion}")
+    print(f"Selected Fecha: {selected_fecha}")
+
     # Si no se ha seleccionado una fecha, usar la fecha de hoy
     if not selected_fecha:
         selected_fecha = datetime.today().strftime('%Y-%m-%d')
+        print(f"No date selected, using today's date: {selected_fecha}")
 
     # Conexión a la base de datos
     conn = get_db_connection()
@@ -22,13 +28,16 @@ def asistencia_por_materia():
     # Obtener las materias para el select
     cursor.execute("SELECT id_materia, materia FROM materias")
     materias = cursor.fetchall()
+    print(f"Materias: {materias}")
 
     # Obtener los años y secciones para los filtros
     cursor.execute("SELECT DISTINCT año FROM seccion")
     años = cursor.fetchall()
+    print(f"Años: {años}")
 
     cursor.execute("SELECT DISTINCT seccion FROM seccion")
     secciones = cursor.fetchall()
+    print(f"Secciones: {secciones}")
 
     # Construir la consulta dinámica
     query = """
@@ -70,8 +79,12 @@ def asistencia_por_materia():
         query += " AND s.seccion = %s"
         params.append(selected_seccion)
 
+    print(f"Query: {query}")
+    print(f"Params: {params}")
+
     cursor.execute(query, params)
     asistencias = cursor.fetchall()
+    print(f"Asistencias: {asistencias}")
 
     cursor.close()
     conn.close()
