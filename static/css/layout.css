@@ -48,9 +48,10 @@ body {
 .nav a {
     color: var(--white);
     text-decoration: none;
-    padding: 8px 12px;
     transition: 0.3s;
     border-bottom: 1px rgba(255, 255, 255, 0) solid;
+    font-size: 12px;
+    
 }
 
 .nav a:hover {

@@ -16,6 +16,7 @@ from routes.inicio import index_bp
 from routes.aula import aula_bp
 from routes.aula_pm import aulapm_bp
 from routes.asistencias import asistencias_bp
+from routes.materias import asistencias_class_bp
 import threading
 import os
 
@@ -39,6 +40,7 @@ app.register_blueprint(index_bp)
 app.register_blueprint(aula_bp)
 app.register_blueprint(aulapm_bp)
 app.register_blueprint(asistencias_bp)
+app.register_blueprint(asistencias_class_bp)
 
 
 
