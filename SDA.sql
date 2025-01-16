@@ -74,7 +74,7 @@ CREATE TABLE salida (
 CREATE TABLE asistencia_materia (
     id_asistencia_materia INT AUTO_INCREMENT PRIMARY KEY, -- Identificador único autoincremental para cada asistencia
     id_estudiante INT NOT NULL,                           -- Referencia al estudiante por ID
-    materia INT NOT NULL,                              -- Referencia a la materia impartida
+    id_materia INT NOT NULL,                              -- Referencia a la materia impartida
     fecha_clase DATE NOT NULL,                            -- Fecha de la clase
     hora_clase TIME NOT NULL,                             -- Hora de la clase
     maestro VARCHAR(250),
@@ -82,8 +82,56 @@ CREATE TABLE asistencia_materia (
     id_justificacion INT,                                 -- Referencia a la justificación, si aplica
     FOREIGN KEY (id_justificacion) REFERENCES justificaciones(id_justificacion) ON DELETE SET NULL, 
     -- Si se elimina una justificación, se deja el campo como NULL en lugar de eliminar el registro.
-    FOREIGN KEY (materia) REFERENCES materias(materia) ON DELETE CASCADE, 
+    FOREIGN KEY (id_materia) REFERENCES materias(id_materia) ON DELETE CASCADE, 
     -- Si se elimina una materia, se eliminan las asistencias relacionadas.
     FOREIGN KEY (id_estudiante) REFERENCES estudiantes(id_estudiante) ON DELETE CASCADE 
     -- Si se elimina un estudiante, se eliminan sus registros de asistencia.
 );
+
+-- Insertar entradas solo para los NIES que terminan en 9, 4 o 7
+INSERT INTO entrada (nie, fecha_entrada, hora_entrada) 
+SELECT nie, CURDATE(), CURTIME()  -- Aquí usamos la fecha y hora actuales
+FROM estudiantes
+WHERE nie LIKE '%9' OR nie LIKE '%4' OR nie LIKE '%7';
+
+USE asistencia;
+INSERT INTO entrada (nie, fecha_entrada, hora_entrada) 
+SELECT nie, '2025-01-16', '13:00:00'
+FROM estudiantes
+WHERE nie LIKE '%9' OR nie LIKE '%4' OR nie LIKE '%7';
+
+
+
+
+USE asistencia;
+truncate table materias;
+
+select * from asistencias_materias;
+
+
+INSERT INTO asistencia_materia (
+    id_estudiante,
+    materia,
+    fecha_clase,
+    hora_clase,
+    maestro,
+    estado,
+    id_justificacion
+)
+VALUES
+    (1, -- ID de estudiante (debe existir en la tabla `estudiantes`)
+     'ciencias', -- ID de materia (debe existir en la tabla `materias`)
+     '2025-01-16', -- Fecha de la clase
+     '08:00:00', -- Hora de la clase
+     'Profesor Pérez', -- Nombre del maestro
+     'Presente', -- Estado de la asistencia ('Presente', 'Ausente', 'Justificado')
+     NULL -- ID de justificación (puede ser NULL si no aplica)
+    );
+
+
+INSERT INTO materias (materia) VALUES 
+('ciencias');
+
+UPDATE materias
+SET materia = ciencias
+WHERE id_materia = 3;

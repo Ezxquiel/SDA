@@ -1,94 +1,78 @@
-from flask import Blueprint, render_template, request
+from flask import Flask, Blueprint, render_template, request
 from datetime import datetime
 from models.datos import get_db_connection
 
+# Blueprint para manejo de asistencias
 asistencias_class_bp = Blueprint('asistencias_class', __name__)
 
 @asistencias_class_bp.route('/asistencia_por_materia', methods=['GET', 'POST'])
 def asistencia_por_materia():
-    selected_materia = request.form.get('materia')  # Materia seleccionada
-    selected_año = request.form.get('año')          # Año seleccionado
-    selected_seccion = request.form.get('seccion')  # Sección seleccionada
-    selected_fecha = request.form.get('fecha')      # Fecha seleccionada
+    # Obtener los datos del formulario
+    selected_materia = request.form.get('materia')
+    selected_año = request.form.get('año')
+    selected_seccion = request.form.get('seccion')
+    selected_fecha = request.form.get('fecha')
 
-    print(f"Selected Materia: {selected_materia}")
-    print(f"Selected Año: {selected_año}")
-    print(f"Selected Seccion: {selected_seccion}")
-    print(f"Selected Fecha: {selected_fecha}")
-
-    # Si no se ha seleccionado una fecha, usar la fecha de hoy
+    # Si no se selecciona fecha, usar la fecha actual
     if not selected_fecha:
         selected_fecha = datetime.today().strftime('%Y-%m-%d')
-        print(f"No date selected, using today's date: {selected_fecha}")
 
     # Conexión a la base de datos
-    conn = get_db_connection()
-    cursor = conn.cursor()
+    with get_db_connection() as conn:
+        with conn.cursor() as cursor:
+            # Obtener materias, años y secciones para los filtros
+            cursor.execute("SELECT id_materia, materia FROM materias")
+            materias = cursor.fetchall()
 
-    # Obtener las materias para el select
-    cursor.execute("SELECT id_materia, materia FROM materias")
-    materias = cursor.fetchall()
-    print(f"Materias: {materias}")
+            cursor.execute("SELECT DISTINCT año FROM seccion")
+            años = cursor.fetchall()
 
-    # Obtener los años y secciones para los filtros
-    cursor.execute("SELECT DISTINCT año FROM seccion")
-    años = cursor.fetchall()
-    print(f"Años: {años}")
+            cursor.execute("SELECT DISTINCT seccion FROM seccion")
+            secciones = cursor.fetchall()
 
-    cursor.execute("SELECT DISTINCT seccion FROM seccion")
-    secciones = cursor.fetchall()
-    print(f"Secciones: {secciones}")
+            # Consulta para obtener asistencias
+            query = """
+                SELECT
+                    am.id_asistencia_materia,
+                    e.nombre AS estudiante,
+                    m.materia,
+                    am.fecha_clase,
+                    am.hora_clase,
+                    am.maestro,
+                    am.estado,
+                    j.tipo AS justificacion,
+                    s.año,
+                    s.seccion
+                FROM
+                    asistencia_materia am
+                JOIN
+                    estudiantes e ON am.id_estudiante = e.id_estudiante
+                JOIN
+                    materias m ON am.materia = m.id_materia
+                LEFT JOIN
+                    justificaciones j ON am.id_justificacion = j.id_justificacion
+                JOIN
+                    seccion s ON e.año = s.año AND e.seccion = s.seccion
+                WHERE am.fecha_clase = %s
+            """
+            params = [selected_fecha]
 
-    # Construir la consulta dinámica
-    query = """
-        SELECT
-            am.id_asistencia_materia,
-            am.id_estudiante,
-            e.nombre AS estudiante,
-            m.materia,
-            am.fecha_clase,
-            am.hora_clase,
-            am.maestro,
-            am.estado,
-            j.tipo AS justificacion,
-            s.año,
-            s.seccion
-        FROM
-            asistencia_materia am
-        JOIN
-            estudiantes e ON am.id_estudiante = e.id_estudiante
-        JOIN
-            materias m ON am.materia = m.id_materia
-        LEFT JOIN
-            justificaciones j ON am.id_justificacion = j.id_justificacion
-        JOIN
-            seccion s ON e.año = s.año AND e.seccion = s.seccion
-        WHERE am.fecha_clase = %s
-    """
-    params = [selected_fecha]
+            if selected_materia:
+                query += " AND am.materia = %s"
+                params.append(selected_materia)
 
-    if selected_materia:
-        query += " AND am.materia = %s"
-        params.append(selected_materia)
+            if selected_año:
+                query += " AND s.año = %s"
+                params.append(selected_año)
 
-    if selected_año:
-        query += " AND s.año = %s"
-        params.append(selected_año)
+            if selected_seccion:
+                query += " AND s.seccion = %s"
+                params.append(selected_seccion)
 
-    if selected_seccion:
-        query += " AND s.seccion = %s"
-        params.append(selected_seccion)
+            cursor.execute(query, params)
+            asistencias = cursor.fetchall()
 
-    print(f"Query: {query}")
-    print(f"Params: {params}")
-
-    cursor.execute(query, params)
-    asistencias = cursor.fetchall()
-    print(f"Asistencias: {asistencias}")
-
-    cursor.close()
-    conn.close()
-
+    # Renderizar el template con los datos
     return render_template(
         'asistencia_por_materia.html',
         materias=materias,
@@ -100,3 +84,4 @@ def asistencia_por_materia():
         selected_seccion=selected_seccion,
         selected_fecha=selected_fecha
     )
+

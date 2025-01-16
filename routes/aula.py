@@ -31,11 +31,11 @@ def gestionar_aula(cursor):
                 query = """
                     SELECT e.id_estudiante, e.nombre, e.codigo
                     FROM estudiantes e
-                    INNER JOIN entrada en ON e.id_estudiante = en.nie
+                    INNER JOIN entrada en ON e.nie = en.nie
                     WHERE e.año = %s 
                       AND e.seccion = %s
                       AND DATE(en.fecha_entrada) = %s
-                      AND TIME(en.hora_entrada) BETWEEN '04:00:00' AND '12:00:00'
+                      AND TIME(en.hora_entrada) BETWEEN '03:00:00' AND '12:00:00'
                 """
                 cursor.execute(query, (año, seccion, fecha_actual))
                 estudiantes = cursor.fetchall()
@@ -64,7 +64,7 @@ def gestionar_aula(cursor):
                 # Procesar el registro de asistencia
                 id_estudiantes = request.form.getlist('id_estudiante[]')
                 estados = request.form.getlist('estado[]')
-                materia = request.form.get('materia')
+                materia = request.form.get('materia')  # Materia por nombre
                 maestro = request.form.get('maestro')
                 fecha_clase = datetime.now().date()
                 hora_clase = datetime.now().time()
