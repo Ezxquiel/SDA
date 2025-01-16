@@ -8,7 +8,7 @@ def insertar_usuario(nombre:str, contraseña:str, rango:str):
             host='127.0.0.1',  # Cambia si usas otro host
             user='root',
             password='',
-            database='asistenciass'
+            database='asistenciaas'
         )
         with conn.cursor() as cursor:
             # Generar hash de la contraseña
