@@ -3,9 +3,9 @@ from models.database import db_operation
 from datetime import datetime
 import pymysql
 
-aula_bp = Blueprint('aula', __name__)
+aulapm_bp = Blueprint('aulapm', __name__)
 
-@aula_bp.route('/gestionar_aula', methods=['GET', 'POST'])
+@aulapm_bp.route('/gestionar_aulapm', methods=['GET', 'POST'])
 @db_operation
 def gestionar_aula(cursor):
     # Inicializar variables para la plantilla
@@ -35,7 +35,7 @@ def gestionar_aula(cursor):
                     WHERE e.año = %s 
                       AND e.seccion = %s
                       AND DATE(en.fecha_entrada) = %s
-                      AND TIME(en.hora_entrada) BETWEEN '04:00:00' AND '12:00:00'
+                      AND TIME(en.hora_entrada) BETWEEN '12:00:00' AND '19:00:00'
                 """
                 cursor.execute(query, (año, seccion, fecha_actual))
                 estudiantes = cursor.fetchall()
@@ -45,7 +45,7 @@ def gestionar_aula(cursor):
                 else:
                     flash(f'Se encontraron {len(estudiantes)} estudiantes.', 'success')
 
-                return render_template('aula.html',
+                return render_template('aula_pm.html',
                                        años=años,
                                        secciones=secciones,
                                        estudiantes=estudiantes,
@@ -54,7 +54,7 @@ def gestionar_aula(cursor):
 
             except pymysql.Error as e:
                 flash(f'Error al buscar estudiantes: {str(e)}', 'danger')
-                return render_template('aula.html',
+                return render_template('aulapm.html',
                                        años=años,
                                        secciones=secciones,
                                        estudiantes=estudiantes)
@@ -78,14 +78,14 @@ def gestionar_aula(cursor):
                     cursor.execute(query, (id_estudiante, materia, fecha_clase, hora_clase, estado, maestro))
 
                 flash('Asistencia registrada exitosamente.', 'success')
-                return redirect(url_for('aula.gestionar_aula'))
+                return redirect(url_for('aulapm.gestionar_aula'))
 
             except pymysql.Error as e:
                 flash(f'Error al registrar asistencia: {str(e)}', 'danger')
-                return redirect(url_for('aula.gestionar_aula'))
+                return redirect(url_for('aulapm.gestionar_aula'))
 
     # Respuesta por defecto para solicitudes GET
-    return render_template('aula.html',
+    return render_template('aula_pm.html',
                            años=años,
                            secciones=secciones,
                            estudiantes=estudiantes,

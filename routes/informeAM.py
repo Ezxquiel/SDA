@@ -39,18 +39,17 @@ class EstudiantesQueries:
             e.nie,
             e.nombre,
             e.codigo,
-            MAX(ent.fecha_entrada) AS fecha_entrada,
-            MAX(ent.hora_entrada) AS hora_entrada
+            ent.fecha_entrada,
+            ent.hora_entrada
         FROM estudiantes e
         LEFT JOIN entrada ent ON e.nie = ent.nie
         WHERE e.año = %s 
         AND e.seccion = %s
-        AND DATE(ent.fecha_entrada) BETWEEN %s AND %s
-        AND ent.hora_entrada BETWEEN '04:00:00' AND '12:58:00'
-        GROUP BY e.nie, e.nombre, e.codigo
+        AND DATE(ent.fecha_entrada) = %s
+        AND ent.hora_entrada BETWEEN '04:00:00' AND '12:00:00'
         """
 
-    @staticmethod
+    @staticmethod 
     def get_inasistidos_query() -> str:
         return """
         SELECT 
@@ -59,8 +58,8 @@ class EstudiantesQueries:
             e.codigo
         FROM estudiantes e
         LEFT JOIN entrada ent ON e.nie = ent.nie
-            AND DATE(ent.fecha_entrada) BETWEEN %s AND %s
-            AND ent.hora_entrada BETWEEN '04:00:00' AND '12:58:00'
+            AND DATE(ent.fecha_entrada) = %s
+            AND ent.hora_entrada BETWEEN '04:00:00' AND '12:00:00'
         WHERE e.año = %s 
         AND e.seccion = %s
         AND ent.nie IS NULL
@@ -92,12 +91,12 @@ class DateRangeValidator:
 
 class EstudiantesService:
     @staticmethod
-    def obtener_estudiantes_asistidos(anio: int, seccion: str, fecha_inicio: date, fecha_fin: date) -> List[Dict]:
+    def obtener_estudiantes_asistidos(anio: int, seccion: str, fecha: date) -> List[Dict]:
         try:
             with DatabaseManager() as db:
                 db.cursor.execute(
                     EstudiantesQueries.get_asistidos_query(),
-                    (anio, seccion, fecha_inicio, fecha_fin)
+                    (anio, seccion, fecha)
                 )
                 return db.cursor.fetchall()
         except Exception as e:
@@ -105,42 +104,35 @@ class EstudiantesService:
             return []
 
     @staticmethod
-    def obtener_estudiantes_inasistidos(anio: int, seccion: str, fecha_inicio: date, fecha_fin: date) -> List[Dict]:
+    def obtener_estudiantes_inasistidos(anio: int, seccion: str, fecha: date) -> List[Dict]:
         try:
             with DatabaseManager() as db:
                 db.cursor.execute(
                     EstudiantesQueries.get_inasistidos_query(),
-                    (fecha_inicio, fecha_fin, anio, seccion)
+                    (fecha, anio, seccion)
                 )
                 return db.cursor.fetchall()
         except Exception as e:
             logger.error(f"Error al obtener estudiantes inasistidos: {str(e)}")
             return []
 
-@informeAM_bp.route('/detalles_seccion/<int:anio>/<seccion>')
+
+@informeAM_bp.route('/detalles_seccion/<int:anio>/<seccion>/<fecha>')
 @login_required
 @admin_required
-def ruta_detalles_seccion(anio: int, seccion: str):
+def ruta_detalles_seccion(anio: int, seccion: str, fecha: str):
     try:
-        # Obtener fechas de los query params o session
-        fecha_inicio_str = request.args.get('fecha_inicio') or session.get('fecha_inicio')
-        fecha_fin_str = request.args.get('fecha_fin') or session.get('fecha_fin')
-        
-        # Validar fechas
-        fecha_inicio, fecha_fin = DateRangeValidator.validate(fecha_inicio_str, fecha_fin_str)
-        
-        # Guardar fechas en sesión
-        session['fecha_inicio'] = fecha_inicio.strftime('%Y-%m-%d')
-        session['fecha_fin'] = fecha_fin.strftime('%Y-%m-%d')
+        # Convertir la fecha del string a date
+        fecha_especifica = datetime.strptime(fecha, '%Y-%m-%d').date()
 
-        # Obtener datos de asistidos e inasistidos
-        asistidos = EstudiantesService.obtener_estudiantes_asistidos(anio, seccion, fecha_inicio, fecha_fin)
-        inasistidos = EstudiantesService.obtener_estudiantes_inasistidos(anio, seccion, fecha_inicio, fecha_fin)
+        # Obtener datos de asistidos e inasistidos para esa fecha específica
+        asistidos = EstudiantesService.obtener_estudiantes_asistidos(anio, seccion, fecha_especifica)
+        inasistidos = EstudiantesService.obtener_estudiantes_inasistidos(anio, seccion, fecha_especifica)
 
         # Validar si hay datos
         if not asistidos and not inasistidos:
-            flash(f"No hay datos disponibles para la sección {seccion} del año {anio} en el rango de fechas seleccionado.", "info")
-            return redirect(url_for('informeAM.home'))
+            flash(f"No hay datos disponibles para la sección {seccion} del año {anio} en la fecha {fecha}.", "info")
+            return redirect(url_for('informe.home'))
 
         # Preparar estadísticas
         estadisticas = {
@@ -148,16 +140,14 @@ def ruta_detalles_seccion(anio: int, seccion: str):
             'total_asistidos': len(asistidos),
             'total_inasistidos': len(inasistidos),
             'porcentaje_asistencia': round(len(asistidos) * 100 / (len(asistidos) + len(inasistidos)), 2) if (len(asistidos) + len(inasistidos)) > 0 else 0,
-            'fecha_inicio': fecha_inicio,
-            'fecha_fin': fecha_fin
+            'fecha': fecha_especifica
         }
 
         return render_template(
             'detalles_seccion.html',
             anio=anio,
             seccion=seccion,
-            fecha_inicio=fecha_inicio,
-            fecha_fin=fecha_fin,
+            fecha=fecha_especifica,
             alumnos_con_asistencia=asistidos,
             alumnos_sin_asistencia=inasistidos,
             estadisticas=estadisticas
@@ -166,4 +156,4 @@ def ruta_detalles_seccion(anio: int, seccion: str):
     except Exception as e:
         logger.error(f"Error en ruta_detalles_seccion: {str(e)}")
         flash("Ocurrió un error al procesar la solicitud.", "danger")
-        return redirect(url_for('informeAM.home'))
+        return redirect(url_for('informe.home'))

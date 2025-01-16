@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/verAsistencia.css')}}">
 </head>
     <form method="POST" class="Formulario">
-        <input type="text" id="Nie" name="busqueda" placeholder="000000000000" autofocus minlength="4" maxlength="15" autocomplete="off">
+        <input type="text" id="Nie" name="busqueda" placeholder="000000000000" autofocus minlength="1" maxlength="15" autocomplete="off">
         <button type="submit">Buscar</button>
     </form>
 
@@ -82,19 +82,19 @@
                 events: [
                     // Asistencias en verde
                     {% for asistencia in asistencias_hoy %}
-                        {
-                            title: 'Asistencia',
-                            start: '{{ asistencia["fecha_entrada"] }}',
-                            color: 'green'
-                        },
+                    {
+                        title: 'Asistencia',
+                        start: '{{ asistencia["fecha_entrada"] }}',
+                        color: 'green'
+                    }{% if not loop.last %},{% endif %}
                     {% endfor %}
                     // Salidas en rojo si falta la asistencia
                     {% for fecha in fechas_sin_asistencia %}
-                        {
-                            title: 'No Asistió',
-                            start: '{{ fecha }}',
-                            color: 'red'
-                        },
+                    {
+                        title: 'No Asistió',
+                        start: '{{ fecha }}',
+                        color: 'red'
+                    }{% if not loop.last %},{% endif %}
                     {% endfor %}
                 ]
             });

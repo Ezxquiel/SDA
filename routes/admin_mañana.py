@@ -67,7 +67,7 @@ def administracionM():
                                     SELECT nie 
                                     FROM entrada
                                     WHERE DATE(fecha_entrada) = DATE(e.fecha_entrada)
-                                    AND TIME(hora_entrada) BETWEEN '04:00:00' AND '12:30:00'
+                                    AND TIME(hora_entrada) BETWEEN '04:00:00' AND '12:00:00'
                                 )
                             ) as total_inasistidos,
                             (
@@ -79,14 +79,14 @@ def administracionM():
                                     SELECT nie 
                                     FROM entrada
                                     WHERE DATE(fecha_entrada) = DATE(e.fecha_entrada)
-                                    AND TIME(hora_entrada) BETWEEN '04:00:00' AND '12:30:00'
+                                    AND TIME(hora_entrada) BETWEEN '04:00:00' AND '12:00:00'
                                 )
                             ) as codigos_inasistidos
                         FROM estudiantes est
                         JOIN seccion sec ON est.año = sec.año AND est.seccion = sec.seccion
                         LEFT JOIN entrada e ON est.nie = e.nie 
                             AND DATE(e.fecha_entrada) BETWEEN %s AND %s
-                            AND TIME(e.hora_entrada) BETWEEN '04:00:00' AND '12:30:00'
+                            AND TIME(e.hora_entrada) BETWEEN '04:00:00' AND '12:00:00'
                         WHERE e.nie IS NOT NULL
                         AND est.genero IN ('M', 'F')
                         {0}
@@ -114,7 +114,7 @@ def administracionM():
                         FROM estudiantes est
                         LEFT JOIN entrada e ON est.nie = e.nie 
                             AND DATE(e.fecha_entrada) BETWEEN %s AND %s
-                            AND TIME(e.hora_entrada) BETWEEN '04:00:00' AND '12:30:00'
+                            AND TIME(e.hora_entrada) BETWEEN '04:00:00' AND '12:00:00'
                         WHERE est.genero IN ('M', 'F')
                         {0}
                     """.format("AND CONCAT(est.año, est.seccion) LIKE %s" if busqueda else "")

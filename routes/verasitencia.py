@@ -52,6 +52,10 @@ def index():
                     salidas_hoy = cursor.fetchall()
                     logging.info(f"Resultados de salidas: {salidas_hoy}")
 
+                    # Eliminar duplicados de las listas
+                    asistencias_hoy2 = list({v['id_entrada']: v for v in asistencias_hoy2}.values())
+                    salidas_hoy = list({v['id_salida']: v for v in salidas_hoy}.values())
+
                     # Mensaje si no hay resultados
                     if not asistencias_hoy2 and not salidas_hoy:
                         flash("No se encontraron registros para la búsqueda.", "info")

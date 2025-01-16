@@ -12,15 +12,19 @@
     <section class="search-section">
         <form class="search-form" method="POST" action="/administracionAM">
             <div class="form-group">
+                <label for="busqueda">Buscar Por Sección</label>
                 <input type="text" 
+                       id="busqueda"
                        name="busqueda" 
                        placeholder="Buscar Por Sección...." 
                        autocomplete="off" 
                        autofocus>
             </div>
             <div class="form-group date-range">
-                <input type="date" name="fecha_inicio" placeholder="Fecha Inicio">
-                <input type="date" name="fecha_fin" placeholder="Fecha fin">
+                <label for="fecha_inicio">Fecha Inicio</label>
+                <input type="date" id="fecha_inicio" name="fecha_inicio" placeholder="Fecha Inicio">
+                <label for="fecha_fin">Fecha Fin</label>
+                <input type="date" id="fecha_fin" name="fecha_fin" placeholder="Fecha fin">
             </div>
             <div class="form-actions">
                 <button type="submit" name="descargar_pdf" value="1" class="btn btn-primary">
@@ -47,6 +51,7 @@
             <table class="records-table">
                 <thead>
                     <tr>
+                        <th>Fecha</th>
                         <th>Sección</th>
                         <th>Asistidos</th>
                         <th>M</th>
@@ -59,12 +64,12 @@
                 <tbody>
                     {% for asistencia in resumen %}
                     <tr>
+                        <td>{{ asistencia.fecha }}</td>
                         <td>
                             <a href="{{ url_for('informeAM.ruta_detalles_seccion', 
                                                 anio=asistencia.año, 
                                                 seccion=asistencia.seccion,
-                                                fecha_inicio=fecha_inicio|string,
-                                                fecha_fin=fecha_fin|string) }}"
+                                                fecha=asistencia.fecha) }}"
                                class="section-link">
                                 {{ asistencia.año }} - {{ asistencia.seccion }}
                             </a>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,17 +13,14 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/estudiantes.css')}}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/global.css')}}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/detalles_seccion.css')}}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/aula.css')}}">
-    
-    
     <title>{{ web_name }} - Instituto Nacional De Apopa INA</title>
- 
 </head>
+
 <body>
     <header class="hd">
         <div class="wrap">
             <div class="logo">
-                <a href="">
+                <a href="/index">
                     <img src="{{url_for('static', filename='img/LogoInaSinFondo.png')}}" alt="Logo del Ina">
                 </a>
             </div>
@@ -30,7 +28,7 @@
             <nav class="nav">
                 <ul>
                     <li><a href="/index">Inicio</a></li>
-                    
+
                     {% if session.get('user_rango') == 'coordinador' %}
                     <li><a href="/estudiantes">Registro de alumno</a></li>
                     <li><a href="/secciones">Sección</a></li>
@@ -40,14 +38,25 @@
                             <li><a href="/administracionAM">Turno Matutino</a></li>
                             <li><a href="/admintardePM">Turno Vespertino</a></li>
                         </ul>
-                    <li><a href="/verasistencia">ver asistencia</a></li>
-                    {% endif %}
                     </li>
+                    <li><a href="/verasistencia">Buscar alumno</a></li>
                     <li><a href="/consultar_asistencias">Sección asistencia</a></li>
-                    <li><a href="/asistencia">Entrada</a></li>
-                    <li><a href="/salida">Salida</a></li>
-                    
+                    {% endif %}
 
+                    <li class="drop">
+                        <a href="" class="main-menu">Control de Asistencia</a>
+                        <ul class="sub">
+                            <li><a href="/asistencia">Entrada</a></li>
+                            <li><a href="/salida">Salida</a></li>
+                        </ul>
+
+                    <li class="drop">
+                        <a href="" class="main-menu">Asistencia por aula</a>
+                        <ul class="sub">
+                            <li><a href="/gestionar_aula">Turno Matutino</a></li>
+                            <li><a href="/gestionar_aulapm">Turno Vespertino</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </nav>
         </div>
@@ -66,13 +75,21 @@
             nav.classList.toggle('show');
         });
 
-        // Toggle submenú
-        const mainMenu = document.querySelector('.main-menu');
-        const sub = document.querySelector('.sub');
-        mainMenu.addEventListener('click', (e) => {
+        // Función para toggle submenú
+        const toggleSubMenu = (e) => {
             e.preventDefault();
-            sub.classList.toggle('show');
+            const subMenu = e.target.nextElementSibling; // Se asume que el submenú es el siguiente hermano del enlace
+            if (subMenu && subMenu.classList.contains('sub') || subMenu.classList.contains('sub2')) {
+                subMenu.classList.toggle('show');
+            }
+        };
+
+        // Añadir event listener a ambos menús
+        const mainMenus = document.querySelectorAll('.main-menu, .main-menu2');
+        mainMenus.forEach(menu => {
+            menu.addEventListener('click', toggleSubMenu);
         });
     </script>
 </body>
+
 </html>

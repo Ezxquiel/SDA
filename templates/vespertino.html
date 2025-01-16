@@ -1,109 +1,165 @@
-{% extends "layout.html" %}
+{% extends 'layout.html' %}
+
 {% block content %}
 
 <div class="admin-container">
-    <h1 class="page-title">Administración Vespertina</h1>
 
-    <!-- Formulario principal -->
-    <form class="search-form" method="POST" action="/admintardePM">
-        <input type="text" name="busqueda" placeholder="Buscar Por Sección...." autocomplete="off" autofocus>
-        <input type="date" name="fecha_inicio" placeholder="Fecha Inicio">
-        <input type="date" name="fecha_fin" placeholder="Fecha fin" >
-        <button type="submit" name="descargar_pdf" value="1" class="btn btn-primary">Descargar PDF</button>
-        <button type="submit" class="btn-search">Buscar</button>
-        <button type="submit" class="btn btn-secondary" name="mostrar_todo" value="1">Ver Todas las Secciones</button>
-    </form>
+    <header class="dashboard-header">
+        <h1 class="page-title">Administración Vespertina</h1>
+    </header>
 
-    <!-- Resultados de la búsqueda de detalles de asistencia -->
-    {% if detalles %}
-    <div class="details-section">
-        <h3>Detalles de Asistencia para la Sección {{ detalles.seccion }}</h3>
-        <table class="details-table">
-            <thead>
-                <tr>
-                    <th>Fecha</th>
-                    <th>Asistidos</th>
-                    <th>Inasistidos</th>
-                    <th>M</th>
-                    <th>F</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for registro in detalles.registros %}
-                <tr>
-                    <td>{{ registro.fecha }}</td>
-                    <td>{{ registro.asistidos }}</td>
-                    <td>{{ registro.inasistidos }}</td>
-                    <td>{{ registro.masculino }}</td>
-                    <td>{{ registro.femenino }}</td>
-                    <td>{{ registro.total }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% else %}
-    <div class="empty-message">No se encontraron detalles para la sección solicitada.</div>
-    {% endif %}
+    <!-- Search and Filter Section -->
+    <section class="search-section">
+        <form class="search-form" method="POST" action="/admintardePM">
+            <div class="form-group">
+                <label for="busqueda">Buscar Por Sección</label>
+                <input type="text" 
+                       id="busqueda"
+                       name="busqueda" 
+                       placeholder="Buscar Por Sección...." 
+                       autocomplete="off" 
+                       autofocus>
+            </div>
+            <div class="form-group date-range">
+                <label for="fecha_inicio">Fecha Inicio</label>
+                <input type="date" id="fecha_inicio" name="fecha_inicio" placeholder="Fecha Inicio">
+                <label for="fecha_fin">Fecha Fin</label>
+                <input type="date" id="fecha_fin" name="fecha_fin" placeholder="Fecha fin">
+            </div>
+            <div class="form-actions">
+                <button type="submit" name="descargar_pdf" value="1" class="btn btn-primary">
+                    <i class="fas fa-download"></i> Descargar PDF
+                </button>
+                <button type="submit" class="btn btn-search">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+                <button type="submit" class="btn btn-secondary" name="mostrar_todo" value="1">
+                    <i class="fas fa-list"></i> Ver Todas las Secciones
+                </button>
+            </div>
+        </form>
+    </section>
 
-    <!-- Resto del contenido -->
-    <div class="records-section">
-        <h2 class="section-title">Resumen de Asistencia por Sección y Día</h2>
+    <!-- Summary Section -->
+    <section class="records-section">
+        <div class="section-header">
+            <h2 class="section-title">Resumen de Asistencia</h2>
+        </div>
+        
         {% if resumen %}
-        <table class="records-table">
-            <thead>
-                <tr>
-                    <th>Fecha</th>
-                    <th>Sección</th>
-                    <th>Asistidos</th>
-                    <th>M</th>
-                    <th>F</th>
-                    <th>Inasistidos</th>
-                    <th>Total</th>
-                    <th>codigo inasistidos</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for asistencia in resumen %}
-                <tr>
-                    <td>{{ asistencia.fecha_entrada }}</td>
-                    <td>
-                        <a href="{{ url_for('informeAM.ruta_detalles_seccion', 
-                                            anio=asistencia.año, 
-                                            seccion=asistencia.seccion,
-                                            fecha_inicio=fecha_inicio|string,
-                                            fecha_fin=fecha_fin|string) }}"
-                           class="section-link">
-                            {{ asistencia.año }} - {{ asistencia.seccion }}
-                        </a>
-                    </td>
-                    <td>{{ asistencia.fecha }}</td> <!-- Solo mostramos la fecha -->
-                    <td>{{ asistencia.seccion }}</td> <!-- Solo mostramos la sección -->
-                    <td>{{ asistencia.total_asistidos }}</td>
-                    <td>{{ asistencia.total_masculino }}</td>
-                    <td>{{ asistencia.total_femenino }}</td>
-                    <td>{{ asistencia.total_inasistidos or 0 }}</td>
-                    <td>{{ asistencia.total_asistidos + asistencia.total_inasistidos }}</td>
-                    <td style="overflow-x: auto; max-width: 290px;">{{ asistencia.codigos_inasistidos or 'N/A' }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="records-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Sección</th>
+                        <th>Asistidos</th>
+                        <th>M</th>
+                        <th>F</th>
+                        <th>Inasistidos</th>
+                        <th>Total</th>
+                        <th>Códigos de Inasistidos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for asistencia in resumen %}
+                    <tr>
+                        <td>{{ asistencia.fecha }}</td>
+                        <td>
+                            <a href="{{ url_for('informe.ruta_detalles_seccionpm', 
+                                                anio=asistencia.año, 
+                                                seccion=asistencia.seccion,
+                                                fecha=asistencia.fecha) }}"
+                               class="section-link">
+                                {{ asistencia.año }} - {{ asistencia.seccion }}
+                            </a>
+                        </td>
+                        <td>{{ asistencia.total_asistidos }}</td>
+                        <td>{{ asistencia.total_masculino }}</td>
+                        <td>{{ asistencia.total_femenino }}</td>
+                        <td>{{ asistencia.total_inasistidos or 0 }}</td>
+                        <td>{{ asistencia.total_asistidos + asistencia.total_inasistidos }}</td>
+                        <td class="codes-cell">{{ asistencia.codigos_inasistidos or 'N/A' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         {% else %}
-        <div class="empty-message">No se encontraron registros para la búsqueda.</div>
+        <div class="empty-message">
+            <i class="fas fa-info-circle"></i>
+            <p>No se encontraron Registros</p>
+        </div>
         {% endif %}
-    </div>
+    </section>
 
-</div>
+    <!-- Statistics Section -->
+    <section class="statistics-section">
+        <div class="section-header">
+            <h2 class="section-title">Estadística General Vespertina</h2>
+        </div>
+        
+        {% if totales %}
+        <div class="table-responsive">
+            <table class="statistics-table">
+                <thead>
+                    <tr>
+                        <th colspan="5" class="text-center">Totales del Turno</th>
+                    </tr>
+                    <tr>
+                        <th>Total Asistidos</th>
+                        <th>Total Masculino</th>
+                        <th>Total Femenino</th>
+                        <th>Total Inasistidos</th>
+                        <th>Total</th>
+                        <th>% Asistencia Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ totales.total_asistidos }}</td>
+                        <td>{{ totales.total_masculino }}</td>
+                        <td>{{ totales.total_femenino }}</td>
+                        <td>{{ totales.total_inasistidos }}</td>
+                        <td>{{ totales.total_inasistidos + totales.total_asistidos}}</td>
+                        <td class="percentage">{{ totales.porcentaje_asistencia }}%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </section>
 
-<div class="search-section-details">
-    <h2 class="section-title">Buscar Detalles de Asistencia por Sección</h2>
-    <form class="search-form" method="GET" action="/detalles/seccion">
-        <input type="text" name="anio" placeholder="Año (Ej. 2024)" required>
-        <input type="text" name="seccion" placeholder="Sección (Ej. 1A, 2B)" required autocomplete="off">
-        <button type="submit" class="btn btn-primary">Buscar Detalles</button>
-    </form>
+    <!-- Charts Section -->
+    <section class="charts-section">
+        <div class="chart-container">
+            <h3 class="chart-title">Porcentaje de Asistencia por Sección</h3>
+            <div class="chart-wrap horizontal">
+                <div class="grid">
+                    {% for asistencia in resumen %}
+                    <div class="bar" 
+                         style="--bar-value:{{ asistencia.porcentaje_asistencia }}%;"
+                         data-name="{{ asistencia.seccion }} - {{ asistencia.porcentaje_asistencia }}%">
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3 class="chart-title">Total de Alumnos por Sección</h3>
+            <div class="chart-wrap horizontal">
+                <div class="grid">
+                    {% for asistencia in resumen %}
+                    <div class="bar" 
+                         style="--bar-value:{{ asistencia.total_asistidos + asistencia.total_inasistidos }}%;"
+                         data-name="Total: {{ asistencia.total_inasistidos - asistencia.total_asistidos }}">
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
 
 {% endblock %}
