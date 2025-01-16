@@ -1,14 +1,12 @@
 import os
 
-
-
 class Config:
     SECRET_KEY = os.urandom(24)
     DB_CONFIG = {
         'host': "127.0.0.1",
         'user': "root",
         'password': "",
-        'database': "asistenciass",
+        'database': "asistenciaas",
         'cursorclass': 'DictCursor'
     }
 
