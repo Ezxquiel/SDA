@@ -1,16 +1,15 @@
+
 # routes.py
+import pymysql 
 from flask import Blueprint, request, flash, redirect, url_for, render_template, send_file, session
 from models.database import db_operation, get_db_connection
 from datetime import datetime, date
 from utils.pdf_generator import AttendanceReport
-from utils.auth_utils import login_required, admin_required
-
+from utils.excel_generator import AttendanceExcelReport  # Add this line
 admin_mañana_bp = Blueprint('admin_mañana', __name__)
 
 @admin_mañana_bp.route('/administracionAM', methods=['GET', 'POST'])
-@login_required
-@admin_required
-def administracionM():
+def administracionPM():
     if 'user_id' not in session:
         flash("Debes iniciar sesión para acceder", "warning")
         return redirect('/login')
@@ -32,8 +31,10 @@ def administracionM():
             fecha_inicio_str = request.form.get('fecha_inicio', str(fecha_inicio))
             fecha_fin_str = request.form.get('fecha_fin', str(fecha_fin))
             mostrar_todo = request.form.get('mostrar_todo')
-            descargar_pdf = request.form.get('descargar_pdf')
-
+            
+            # Verificar qué datos están llegando
+            print("Datos del formulario:", request.form)
+            
             try:
                 fecha_inicio = datetime.strptime(fecha_inicio_str, '%Y-%m-%d').date()
                 fecha_fin = datetime.strptime(fecha_fin_str, '%Y-%m-%d').date()
@@ -67,7 +68,7 @@ def administracionM():
                                     SELECT nie 
                                     FROM entrada
                                     WHERE DATE(fecha_entrada) = DATE(e.fecha_entrada)
-                                    AND TIME(hora_entrada) BETWEEN '04:00:00' AND '12:00:00'
+                                    AND TIME(hora_entrada) BETWEEN '04:00:00' AND '12:01:00'
                                 )
                             ) as total_inasistidos,
                             (
@@ -79,21 +80,20 @@ def administracionM():
                                     SELECT nie 
                                     FROM entrada
                                     WHERE DATE(fecha_entrada) = DATE(e.fecha_entrada)
-                                    AND TIME(hora_entrada) BETWEEN '04:00:00' AND '12:00:00'
+                                    AND TIME(hora_entrada) BETWEEN '04:00:00' AND '12:01:00'
                                 )
                             ) as codigos_inasistidos
                         FROM estudiantes est
                         JOIN seccion sec ON est.año = sec.año AND est.seccion = sec.seccion
                         LEFT JOIN entrada e ON est.nie = e.nie 
                             AND DATE(e.fecha_entrada) BETWEEN %s AND %s
-                            AND TIME(e.hora_entrada) BETWEEN '04:00:00' AND '12:00:00'
+                            AND TIME(e.hora_entrada) BETWEEN '04:00:00' AND '12:01:00'
                         WHERE e.nie IS NOT NULL
                         AND est.genero IN ('M', 'F')
                         {0}
                         GROUP BY sec.año, sec.seccion, DATE(e.fecha_entrada)
                         ORDER BY sec.año, sec.seccion, fecha_entrada
-                        """.format("AND CONCAT(sec.año, sec.seccion) LIKE %s" if busqueda else "")
-
+                    """.format("AND CONCAT(sec.año, sec.seccion) LIKE %s" if busqueda else "")
 
 
                     # Consulta de totales simplificada
@@ -114,7 +114,7 @@ def administracionM():
                         FROM estudiantes est
                         LEFT JOIN entrada e ON est.nie = e.nie 
                             AND DATE(e.fecha_entrada) BETWEEN %s AND %s
-                            AND TIME(e.hora_entrada) BETWEEN '04:00:00' AND '12:00:00'
+                            AND TIME(e.hora_entrada) BETWEEN '04:00:00' AND '12:01:00'
                         WHERE est.genero IN ('M', 'F')
                         {0}
                     """.format("AND CONCAT(est.año, est.seccion) LIKE %s" if busqueda else "")
@@ -144,43 +144,47 @@ def administracionM():
                         total = totales['total_asistidos'] + totales['total_inasistidos']
                         totales['porcentaje_asistencia'] = round((totales['total_asistidos'] / total * 100), 2) if total > 0 else 0
 
-                    # Verificar si se debe generar PDF
-                    if descargar_pdf and resumen and totales:
-                        try:
+                        # Verificar si se debe generar PDF
+                if request.form.get('descargar_reporte') and resumen and totales:
+                    formato = request.form.get('formato', 'pdf')
+                    print(f"Generando reporte en formato: {formato}")  # Debug
+                    try:
+                        if formato == 'pdf':
                             report = AttendanceReport(resumen, totales, fecha_inicio, fecha_fin)
-                            pdf_filename = report.generate()
+                            filename = report.generate()
+                            print(f"Archivo PDF generado: {filename}")  # Debug
                             return send_file(
-                                pdf_filename,
+                                filename,
                                 mimetype='application/pdf',
                                 as_attachment=True,
-                                download_name='reporte_asistencia.pdf'
+                                download_name=f'reporte_asistencia_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pdf'
                             )
-                        except Exception as e:
-                            print(f"Error al generar PDF: {str(e)}")
-                            flash("Error al generar el PDF.", "danger")
+                        elif formato == 'excel':
+                            report = AttendanceExcelReport(resumen, totales, fecha_inicio, fecha_fin)
+                            filename = report.generate()
+                            print(f"Archivo Excel generado: {filename}")  # Debug
+                            return send_file(
+                                filename,
+                                mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                                as_attachment=True,
+                                download_name=f'reporte_asistencia_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+                            )
+                    except Exception as e:
+                        print(f"Error al generar reporte: {str(e)}")  # Debug
+                        flash(f"Error al generar el reporte en formato {formato}.", "danger")
 
             except Exception as e:
-                print(f"Error en la consulta: {str(e)}")
-                flash("Error al consultar la base de datos.", "danger")
-
-    except Exception as e:
-        print(f"Error general: {str(e)}")
-        flash("Ocurrió un error inesperado.", "danger")
-        return render_template('matutino.html', resumen=[], totales={}, busqueda='', 
-                             fecha_inicio=fecha_inicio, fecha_fin=fecha_fin)
+                print(f"Error general: {str(e)}")  # Debug
+                flash("Ocurrió un error inesperado.", "danger")
+                return render_template('matutino.html', resumen=[], totales={}, 
+                                    busqueda='', fecha_inicio=fecha_inicio, fecha_fin=fecha_fin)
 
     finally:
         if conn:
             conn.close()
 
-    # Add the date and day of the week to each record
-    for record in resumen:
-        if record['fecha_entrada']:
-            record['fecha'] = record['fecha_entrada'].strftime('%Y-%m-%d')
-            record['dia_semana'] = record['fecha_entrada'].strftime('%A')
-        else:
-            record['fecha'] = fecha_inicio.strftime('%Y-%m-%d')
-            record['dia_semana'] = fecha_inicio.strftime('%A')
+    return render_template('matutino.html', resumen=resumen, totales=totales, 
+                         busqueda=busqueda, fecha_inicio=fecha_inicio, fecha_fin=fecha_fin)
 
-    return render_template('matutino.html', resumen=resumen, totales=totales, busqueda=busqueda, 
-                         fecha_inicio=fecha_inicio, fecha_fin=fecha_fin, web_name='Matutino')
+
+                         

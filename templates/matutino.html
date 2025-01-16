@@ -3,14 +3,13 @@
 {% block content %}
 
 <div class="admin-container">
-
     <header class="dashboard-header">
         <h1 class="page-title">Administración Matutina</h1>
     </header>
 
     <!-- Search and Filter Section -->
     <section class="search-section">
-        <form class="search-form" method="POST" action="/administracionAM">
+        <form class="search-form" method="POST" action="/admintardePM">
             <div class="form-group">
                 <label for="busqueda">Buscar Por Sección</label>
                 <input type="text" 
@@ -22,13 +21,13 @@
             </div>
             <div class="form-group date-range">
                 <label for="fecha_inicio">Fecha Inicio</label>
-                <input type="date" id="fecha_inicio" name="fecha_inicio" placeholder="Fecha Inicio">
+                <input type="date" id="fecha_inicio" name="fecha_inicio" value="{{ fecha_inicio }}" placeholder="Fecha Inicio">
                 <label for="fecha_fin">Fecha Fin</label>
-                <input type="date" id="fecha_fin" name="fecha_fin" placeholder="Fecha fin">
+                <input type="date" id="fecha_fin" name="fecha_fin" value="{{ fecha_fin }}" placeholder="Fecha fin">
             </div>
             <div class="form-actions">
-                <button type="submit" name="descargar_pdf" value="1" class="btn btn-primary">
-                    <i class="fas fa-download"></i> Descargar PDF
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#downloadModal">
+                    <i class="fas fa-download"></i> Descargar Reporte
                 </button>
                 <button type="submit" class="btn btn-search">
                     <i class="fas fa-search"></i> Buscar
@@ -104,13 +103,14 @@
             <table class="statistics-table">
                 <thead>
                     <tr>
-                        <th colspan="5" class="text-center">Totales del Turno</th>
+                        <th colspan="6" class="text-center">Totales del Turno</th>
                     </tr>
                     <tr>
                         <th>Total Asistidos</th>
                         <th>Total Masculino</th>
                         <th>Total Femenino</th>
                         <th>Total Inasistidos</th>
+                        <th>Total</th>
                         <th>% Asistencia Total</th>
                     </tr>
                 </thead>
@@ -120,6 +120,7 @@
                         <td>{{ totales.total_masculino }}</td>
                         <td>{{ totales.total_femenino }}</td>
                         <td>{{ totales.total_inasistidos }}</td>
+                        <td>{{ totales.total_inasistidos + totales.total_asistidos}}</td>
                         <td class="percentage">{{ totales.porcentaje_asistencia }}%</td>
                     </tr>
                 </tbody>
@@ -151,13 +152,82 @@
                     {% for asistencia in resumen %}
                     <div class="bar" 
                          style="--bar-value:{{ asistencia.total_asistidos + asistencia.total_inasistidos }}%;"
-                         data-name="Total: {{ asistencia.total_asistidos + asistencia.total_inasistidos }} - {{ asistencia.año }}{{ asistencia.seccion }}">
+                         data-name="Total: {{ asistencia.total_asistidos + asistencia.total_inasistidos }}">
                     </div>
                     {% endfor %}
                 </div>
             </div>
         </div>
     </section>
+
+    <!-- Modal de Descarga -->
+    <div class="modal fade" id="downloadModal" tabindex="-1" aria-labelledby="downloadModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="downloadModalLabel">
+                        <i class="fas fa-download me-2"></i>Descargar Reporte
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-center mb-4">Seleccione el formato de descarga:</p>
+                    <div class="d-grid gap-3">
+                        <button type="button" 
+                                class="btn btn-danger d-flex align-items-center justify-content-center gap-2" 
+                                onclick="submitForm('pdf')">
+                            <i class="fas fa-file-pdf"></i>
+                            Descargar PDF
+                        </button>
+                        <button type="button" 
+                                class="btn btn-success d-flex align-items-center justify-content-center gap-2" 
+                                onclick="submitForm('excel')">
+                            <i class="fas fa-file-excel"></i>
+                            Descargar Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+
+<!-- Script para manejar la descarga -->
+<script>
+function submitForm(format) {
+    // Debug
+    console.log('Formato seleccionado:', format);
+    
+    // Clonar el formulario actual
+    const originalForm = document.querySelector('.search-form');
+    const form = originalForm.cloneNode(true);
+    
+    // Agregar el campo de formato
+    const formatInput = document.createElement('input');
+    formatInput.type = 'hidden';
+    formatInput.name = 'formato';
+    formatInput.value = format;
+    form.appendChild(formatInput);
+    
+    // Agregar campo para indicar que es una descarga
+    const downloadInput = document.createElement('input');
+    downloadInput.type = 'hidden';
+    downloadInput.name = 'descargar_reporte';
+    downloadInput.value = '1';
+    form.appendChild(downloadInput);
+    
+    // Debug
+    console.log('Enviando formulario con datos:', {
+        formato: format,
+        descargar_reporte: '1'
+    });
+    
+    // Enviar el formulario
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+}
+</script>
 
 {% endblock %}

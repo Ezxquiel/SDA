@@ -23,14 +23,6 @@ class AttendanceReport:
     def setup_pdf(self):
         self.pdf.add_page()
         self.pdf.set_font('Arial', 'B', 16)
-        self.add_watermark()
-
-    def add_watermark(self):
-        try:
-            self.pdf.set_fill_color(240, 240, 240)
-            self.pdf.image('static/img/ardilla.png', 50, 100, 120)
-        except Exception as e:
-            print(f"No se pudo cargar la marca de agua: {str(e)}")
 
     def add_header(self):
         self.pdf.set_fill_color(*Colors.PRIMARY)
@@ -96,8 +88,8 @@ class AttendanceReport:
         self.pdf.set_text_color(*Colors.PRIMARY)
         self.pdf.cell(0, 10, 'Detalle por Sección', 0, 1)
         
-        headers = ['Año', 'Sección', 'Asist.', 'M', 'F', 'Inasist.', 'Total de alumnos', '% Asist.']
-        col_widths = [20, 25, 25, 20, 20, 25, 25, 25]
+        headers = ['Fecha','Año', 'Sección', 'Asist.', 'M', 'F', 'Inasist.', 'Total de alumnos', '% Asist.']
+        col_widths = [20, 20, 25, 25, 20, 20, 25, 25, 25]
         
         self.pdf.set_font('Arial', 'B', 10)
         self.pdf.set_fill_color(*Colors.HEADER_BLUE)
@@ -114,15 +106,16 @@ class AttendanceReport:
             fill = Colors.LIGHT_BLUE if i % 2 == 0 else Colors.WHITE
             self.pdf.set_fill_color(*fill)
             
-            self.pdf.cell(col_widths[0], 10, str(row['año']), 1, 0, 'C', True)
-            self.pdf.cell(col_widths[1], 10, str(row['seccion']), 1, 0, 'C', True)
-            self.pdf.cell(col_widths[2], 10, str(row['total_asistidos']), 1, 0, 'C', True)
-            self.pdf.cell(col_widths[3], 10, str(row['total_masculino']), 1, 0, 'C', True)
-            self.pdf.cell(col_widths[4], 10, str(row['total_femenino']), 1, 0, 'C', True)
-            self.pdf.cell(col_widths[5], 10, str(row['total_inasistidos']), 1, 0, 'C', True)
+            self.pdf.cell(col_widths[0], 10, str(row['fecha_entrada']), 1, 0, 'C', True)
+            self.pdf.cell(col_widths[1], 10, str(row['año']), 1, 0, 'C', True)
+            self.pdf.cell(col_widths[2], 10, str(row['seccion']), 1, 0, 'C', True)
+            self.pdf.cell(col_widths[3], 10, str(row['total_asistidos']), 1, 0, 'C', True)
+            self.pdf.cell(col_widths[4], 10, str(row['total_masculino']), 1, 0, 'C', True)
+            self.pdf.cell(col_widths[5], 10, str(row['total_femenino']), 1, 0, 'C', True)
+            self.pdf.cell(col_widths[6], 10, str(row['total_inasistidos']), 1, 0, 'C', True)
             total = row['total_inasistidos'] + row['total_asistidos']
-            self.pdf.cell(col_widths[6], 10, str(total), 1, 0, 'C', True)
-            self.pdf.cell(col_widths[7], 10, f"{row['porcentaje_asistencia']}%", 1, 0, 'C', True)
+            self.pdf.cell(col_widths[7], 10, str(total), 1, 0, 'C', True)
+            self.pdf.cell(col_widths[8], 10, f"{row['porcentaje_asistencia']}%", 1, 0, 'C', True)
             self.pdf.ln()
 
     def add_absence_codes_table(self):
@@ -133,8 +126,8 @@ class AttendanceReport:
         self.pdf.cell(0, 10, 'Detalle de Códigos de Inasistencia', 0, 1)
         self.pdf.ln(5)
         
-        headers = ['Año', 'Sección', 'Inasistencias']
-        col_widths = [25, 35, 120]
+        headers = ['Fecha','Año', 'Sección', 'Inasistencias']
+        col_widths = [20, 25, 35, 110]
         
         self.pdf.set_font('Arial', 'B', 10)
         self.pdf.set_fill_color(*Colors.HEADER_BLUE)
@@ -157,12 +150,13 @@ class AttendanceReport:
                 lines = len(codigos) // 60 + 1
                 height = max(8, 6 * lines)
                 
-                self.pdf.cell(col_widths[0], height, str(row['año']), 1, 0, 'C', True)
-                self.pdf.cell(col_widths[1], height, str(row['seccion']), 1, 0, 'C', True)
+                self.pdf.cell(col_widths[0], height, str(row['fecha_entrada']), 1, 0, 'C', True)
+                self.pdf.cell(col_widths[1], height, str(row['año']), 1, 0, 'C', True)
+                self.pdf.cell(col_widths[2], height, str(row['seccion']), 1, 0, 'C', True)
                 
                 x = self.pdf.get_x()
                 y = self.pdf.get_y()
-                self.pdf.multi_cell(col_widths[2], height, codigos, 1, 'C', True)
+                self.pdf.multi_cell(col_widths[3], 6, codigos, 1, 'C', True)
                 
                 if i < len(self.resumen) - 1:
                     self.pdf.set_xy(self.pdf.l_margin, y + height)
