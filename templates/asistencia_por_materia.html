@@ -3,20 +3,19 @@
 {% block content %}
     <div class="container mt-5">
         <h1 class="text-center">Asistencias por Materia</h1>
-        <form method="POST" class="mb-4">
+
+        <form method="POST" action="{{ url_for('asistencias_class.asistencia_por_materia') }}">
             <div class="row">
                 <div class="col-md-4">
                     <label for="materia" class="form-label">Materia:</label>
                     <select id="materia" name="materia" class="form-control" required>
                         <option value="">Seleccione una materia</option>
                         {% for materia in materias %}
-                            <option value="{{ materia.id_materia }}">{{ materia.materia }}</option>
+                            <option value="{{ materia.id_materia }}" {% if materia.id_materia == selected_materia %}selected{% endif %}>
+                                {{ materia.materia }}
+                            </option>
                         {% endfor %}
                     </select>
-                </div>
-                <div class="col-md-4">
-                    <label for="fecha" class="form-label">Fecha:</label>
-                    <input type="date" id="fecha" name="fecha" class="form-control">
                 </div>
                 <div class="col-md-4 text-center">
                     <button type="submit" class="btn btn-primary mt-4">Consultar</button>
@@ -25,33 +24,32 @@
         </form>
 
         {% if asistencias %}
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Materia</th>
-                    <th>Año</th>
-                    <th>Sección</th>
-                    <th>Fecha</th>
-                    <th>Hora</th>
-                    <th>Total de Asistencias</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for asistencia in asistencias %}
-                <tr>
-                    <td>{{ asistencia.materia }}</td>
-                    <td>{{ asistencia.año }}</td>
-                    <td>{{ asistencia.seccion }}</td>
-                    <td>{{ asistencia.fecha_clase }}</td>
-                    <td>{{ asistencia.hora_clase }}</td>
-                    <td>{{ asistencia.total_asistencias }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Estudiante</th>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Maestro</th>
+                        <th>Estado</th>
+                        <th>Justificación</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for asistencia in asistencias %}
+                        <tr>
+                            <td>{{ asistencia.estudiante }}</td>
+                            <td>{{ asistencia.fecha_clase }}</td>
+                            <td>{{ asistencia.hora_clase }}</td>
+                            <td>{{ asistencia.maestro }}</td>
+                            <td>{{ asistencia.estado }}</td>
+                            <td>{{ asistencia.justificacion or 'N/A' }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         {% else %}
-        <p class="text-center text-muted">No hay registros de asistencia para los criterios seleccionados.</p>
+            <p class="text-center text-muted">No hay registros de asistencia para la materia seleccionada.</p>
         {% endif %}
     </div>
 {% endblock %}
-
