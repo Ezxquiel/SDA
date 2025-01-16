@@ -1,6 +1,42 @@
 {% extends 'layout.html' %}
 
 {% block content %}
+
+<style>
+    .table-container {
+        width: 100%;
+        overflow-x: auto; /* Agrega desplazamiento horizontal si es necesario */
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: start;
+    }
+
+    thead {
+        background-color: #007bff;
+        color: white;
+        text-align: left;
+    }
+
+    th, td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: start;
+    }
+
+    tbody tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
+
+    /* Asegurar que las columnas sean responsivas */
+    th, td {
+        white-space: nowrap; /* Evita que el texto se divida en múltiples líneas */
+    }
+</style>
+
+
 <div class="container mt-5">
     <h1 class="text-center">Asistencias por Materia</h1>
 
@@ -18,7 +54,7 @@
                 </select>
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label for="año" class="form-label">Año:</label>
                 <select id="año" name="año" class="form-control">
                     <option value="">Seleccione un año</option>
@@ -30,7 +66,7 @@
                 </select>
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label for="seccion" class="form-label">Sección:</label>
                 <select id="seccion" name="seccion" class="form-control">
                     <option value="">Seleccione una sección</option>
@@ -42,6 +78,11 @@
                 </select>
             </div>
 
+            <div class="col-md-2">
+                <label for="fecha" class="form-label">Fecha:</label>
+                <input type="date" id="fecha" name="fecha" class="form-control" value="{{ selected_fecha }}">
+            </div>
+
             <div class="col-md-3 text-center">
                 <button type="submit" class="btn btn-primary mt-4">Consultar</button>
             </div>
@@ -49,8 +90,8 @@
     </form>
 
     {% if asistencias %}
-        <table class="table table-bordered mt-4">
-            <thead>
+        <table class="table table-bordered mt-4" >
+            <thead">
                 <tr>
                     <th>Estudiante</th>
                     <th>Materia</th>
@@ -66,7 +107,7 @@
             <tbody>
                 {% for asistencia in asistencias %}
                     <tr>
-                        <td>{{ asistencia.estudiante }}</td>
+                        <td >{{ asistencia.estudiante }}</td>
                         <td>{{ asistencia.materia }}</td>
                         <td>{{ asistencia.año }}</td>
                         <td>{{ asistencia.seccion }}</td>

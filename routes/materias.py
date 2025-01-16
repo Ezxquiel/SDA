@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request
+from datetime import datetime
 from models.datos import get_db_connection
 
 asistencias_class_bp = Blueprint('asistencias_class', __name__)
@@ -8,6 +9,11 @@ def asistencia_por_materia():
     selected_materia = request.form.get('materia')  # Materia seleccionada
     selected_año = request.form.get('año')          # Año seleccionado
     selected_seccion = request.form.get('seccion')  # Sección seleccionada
+    selected_fecha = request.form.get('fecha')      # Fecha seleccionada
+
+    # Si no se ha seleccionado una fecha, usar la fecha de hoy
+    if not selected_fecha:
+        selected_fecha = datetime.today().strftime('%Y-%m-%d')
 
     # Conexión a la base de datos
     conn = get_db_connection()
@@ -48,9 +54,9 @@ def asistencia_por_materia():
             justificaciones j ON am.id_justificacion = j.id_justificacion
         JOIN
             seccion s ON e.año = s.año AND e.seccion = s.seccion
-        WHERE 1 = 1
+        WHERE am.fecha_clase = %s
     """
-    params = []
+    params = [selected_fecha]
 
     if selected_materia:
         query += " AND am.materia = %s"
@@ -78,5 +84,6 @@ def asistencia_por_materia():
         asistencias=asistencias,
         selected_materia=selected_materia,
         selected_año=selected_año,
-        selected_seccion=selected_seccion
+        selected_seccion=selected_seccion,
+        selected_fecha=selected_fecha
     )
