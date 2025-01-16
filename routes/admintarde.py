@@ -186,6 +186,15 @@ def administracionPM():
         if conn:
             conn.close()
 
+
+    for record in resumen:
+        if record['fecha_entrada']:
+            record['fecha'] = record['fecha_entrada'].strftime('%Y-%m-%d')
+            record['dia_semana'] = record['fecha_entrada'].strftime('%A')
+        else:
+            record['fecha'] = fecha_inicio.strftime('%Y-%m-%d')
+            record['dia_semana'] = fecha_inicio.strftime('%A')
+
     return render_template('vespertino.html', resumen=resumen, totales=totales, 
                          busqueda=busqueda, fecha_inicio=fecha_inicio, fecha_fin=fecha_fin)
 
