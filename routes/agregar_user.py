@@ -7,8 +7,8 @@ def insertar_usuario(nombre:str, contraseña:str, rango:str):
         conn = pymysql.connect(
             host='127.0.0.1',  # Cambia si usas otro host
             user='root',
-            password='',
-            database='asistenciaas'
+            password='7003',
+            database='asistencia'
         )
         with conn.cursor() as cursor:
             # Generar hash de la contraseña

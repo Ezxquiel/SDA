@@ -3,7 +3,6 @@ from functools import wraps
 from config.config import Config
 from routes.students import students_bp
 from routes.attendance import attendance_bp
-from routes.admin import admin_bp
 from routes.sections import sections_bp
 from routes.admintarde import admintarde_bp
 from routes.verasitencia import verasitencia_bp
@@ -30,7 +29,6 @@ app.secret_key = 'ADN INA'  # Configura la clave secreta para la sesión
 # Registrar los blueprints
 app.register_blueprint(students_bp)
 app.register_blueprint(attendance_bp)
-app.register_blueprint(admin_bp)
 app.register_blueprint(sections_bp)
 app.register_blueprint(admintarde_bp)
 app.register_blueprint(admin_mañana_bp)

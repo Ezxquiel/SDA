@@ -48,13 +48,14 @@ def asistencia_por_materia():
                 JOIN
                     estudiantes e ON am.id_estudiante = e.id_estudiante
                 JOIN
-                    materias m ON am.materia = m.id_materia
+                    materias m ON am.materia = m.materia
                 LEFT JOIN
                     justificaciones j ON am.id_justificacion = j.id_justificacion
                 JOIN
                     seccion s ON e.año = s.año AND e.seccion = s.seccion
                 WHERE am.fecha_clase = %s
             """
+
             params = [selected_fecha]
 
             if selected_materia:

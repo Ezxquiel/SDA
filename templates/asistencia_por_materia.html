@@ -43,15 +43,16 @@
     <form method="POST" action="{{ url_for('asistencias_class.asistencia_por_materia') }}">
         <div class="row">
             <div class="col-md-3">
-                <label for="materia" class="form-label">Materia:</label>
-                <select id="materia" name="materia" class="form-control">
-                    <option value="">Seleccione una materia</option>
+                <label for="materia">Materia:</label>
+                <select id="materia" name="materia">
+                    <option value="" selected>Seleccione una materia</option>
                     {% for materia in materias %}
-                        <option value="{{ materia.id_materia }}" {% if materia.id_materia == selected_materia %}selected{% endif %}>
-                            {{ materia.materia }}
+                        <option value="{{ materia['materia'] }}" {% if materia['materia'] == selected_materia %}selected{% endif %}>
+                            {{ materia['materia'] }}
                         </option>
                     {% endfor %}
                 </select>
+                
             </div>
 
             <div class="col-md-2">
