@@ -37,7 +37,7 @@ CREATE TABLE estudiantes (
     id_estudiante INT AUTO_INCREMENT PRIMARY KEY,    -- Identificador único autoincremental para cada estudiante
     nombre VARCHAR(200) NOT NULL,                    -- Nombre completo del estudiante, no permite valores nulos
     nie VARCHAR(15) UNIQUE NOT NULL,                 -- Número de identificación único del estudiante
-    edad TINYINT UNSIGNED,                           -- Edad del estudiante, solo permite valores positivos
+    edad INT(5),                           -- Edad del estudiante, solo permite valores positivos
     genero ENUM('M', 'F') DEFAULT 'M',               -- Género del estudiante, restringido a 'M' o 'F', con valor por defecto 'M'
     año INT NOT NULL,                                -- Año escolar del estudiante
     seccion CHAR(1) NOT NULL,                        -- Sección del estudiante                         
